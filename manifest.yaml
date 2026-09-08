@@ -6,6 +6,15 @@ title: "The Vardi–Immerman theorem"
 authors: []
 bibEntries:
   - |
+    @book{Libkin2004,
+      author = {Leonid Libkin},
+      title = {Elements of Finite Model Theory},
+      publisher = {Springer},
+      year = {2004},
+      doi = {10.1007/978-3-662-07003-1},
+      url = {https://homepages.inf.ed.ac.uk/libkin/fmt/fmt.pdf}
+    }
+  - |
     @article{Immerman1986,
       author = {Neil Immerman},
       title = {Relational Queries Computable in Polynomial Time},

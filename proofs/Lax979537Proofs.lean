@@ -8,3 +8,11 @@ import Lax979537Proofs.DecisionProcedure
 import Lax979537Proofs.InputSize
 import Lax979537Proofs.SyntaxOperations
 import Lax979537Proofs.TupleOrder
+import Lax979537Proofs.PolynomialBounds
+import Lax979537Proofs.EvaluationWork
+import Lax979537Proofs.ComputationTableau
+import Lax979537Proofs.FormulaMacros
+import Lax979537Proofs.PositiveRules
+import Lax979537Proofs.TupleAddresses
+import Lax979537Proofs.AddressFormulas
+import Lax979537Proofs.FiniteExceptions

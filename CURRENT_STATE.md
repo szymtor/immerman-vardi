@@ -7,6 +7,10 @@ and completion of the submission. The concepts are frozen and unchanged from
 commit cf16245. No further permission is needed for proof work. The task is
 not complete: both main computational directions remain open.
 
+The user has now explicitly made completion and submission our active goal.
+They also emphasized that any polynomial runtime bound is sufficient; do not
+spend effort optimizing constants or exponents. No token budget was requested.
+
 ## Mathematical interface
 
 Read `PROPOSED_CONCEPTS.md`. The theorem is `Definable Q ↔ InP Q` for every
@@ -45,6 +49,30 @@ Further proved implementation results, all in the proof package:
   and LFP binders preserves semantics, admissibility, and positivity.
 - `TupleOrder`: finite conjunction/disjunction and a verified admissible FO
   definition of lexicographic tuple order, independent of domain size.
+- `PolynomialBounds.exists_power`: a fixed polynomial is strictly dominated
+  by one power of n for all n ≥ 2; includes polynomial evaluation monotonicity.
+- `EvaluationWork.work_le_input_length`: an explicit conservative charge for
+  the existing materialized-table algorithm is polynomial in encoded input
+  length. It covers nested LFP, tuple/table scans, and bounded environments.
+  This charge is NOT a TM2 machine step bound and is not advertised as one.
+- `ComputationTableau.stage_iff` and `leastFixedPoint_iff`: every stage of a
+  positive local transition operator contains exactly the intended prefix of
+  the computation, with no spurious cell symbols. This is a generic local
+  system, not yet an instantiation for arbitrary finite TM2 machines. The
+  number of dependencies d is required positive for the exact stage invariant.
+- `FormulaMacros`: first-order context copying, block existential binding,
+  and preservation of semantics, admissibility, positivity, and FO syntax.
+- `PositiveRules.eval_closure`: a finite list of FO-guarded positive Horn
+  rules compiles to a real admissible formula in the approved concept syntax,
+  with a proof that it defines the least closed relation. No Lax assumptions.
+- `TupleAddresses.address_lt_iff`: an explicit big-endian equivalence between
+  k-tuples over Fin n and Fin (n^k), respecting the existing FO lex order.
+- `AddressFormulas`: FO definitions and semantic proofs for address zero,
+  successor, fixed numerals, size bounds, and exact domain sizes.
+- `FiniteExceptions`: finite FO diagrams characterize each canonical pointed
+  structure; `bounded_definable` covers any query on sizes ≤ N, and
+  `definable_of_above` patches a definition valid for sizes > N. This includes
+  nullary relation bits on the empty universe.
 
 ## Remaining main proof obligations
 
@@ -57,10 +85,18 @@ Further proved implementation results, all in the proof package:
    The correctness half is already `decideFormula_correct`.
 2. `VardiImmerman.ptimeDefinable`: construct a positive fixed-point formula
    for an arbitrary polynomial-time finite TM2 computation. Renaming and
-   tuple ordering are available; the computation tableau, input-address
-   interpretation, finite-control encoding, and simulation proof are not.
-   The size-zero and size-one cases require separate treatment when using
-   tuples to index polynomially many tape positions and times.
+   tuple ordering, numerical address formulas, a generic positive tableau
+   invariant, and a positive-rule syntax compiler are available. The remaining
+   work is the actual TM2 instantiation: input-bit interpretation for the
+   chosen encoding, finite-control/symbol encoding, and machine simulation.
+   Small-domain exceptions now have a proved general solution in
+   `FiniteExceptions.definable_of_above`.
+
+Do not mistake a rule/operator correspondence assumption for the machine
+simulation proof. The current positive-rule compiler has no extra parameters
+inside rules; pointed input parameters must be handled during instantiation
+or by generalizing this proof-only compiler. Approved syntax already supports
+them. The finite-exception construction does support arbitrary query arity.
 
 The inspected mathlib `TM2ComputableInPolyTime` module does not provide a
 ready-made compiler for the relation-table evaluator. Lax51 has substantial
@@ -96,3 +132,37 @@ The preview uses http://localhost:8125/lax-979537/index.html when running.
 
 Continue with the two main obligations above. Do not change the approved
 concepts, introduce sorry or new proof axioms, or use circular assumptions.
+
+## Current iteration checks
+
+The eight new helper modules listed above compile. A complete `lake build`
+passed with 1,236 jobs before the final small-exception patching lemma; that
+lemma also compiled subsequently. `tests/Constructions.lean` checks generated
+reachability rules, tuple successor carries and boundaries, exact domain
+sizes, pointed diagrams, and nullary predicates on an empty universe, and
+prints the axiom sets of the main new results. The construction tests passed;
+all eight audited theorem axiom sets contain only propext, Classical.choice,
+and Quot.sound. The test inputs needed explicit Fin 3 annotations; this was
+a test elaboration fix, not a proof or concept change.
+
+Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in 3m12s
+(kernel replay 2m35s): eight concepts and seven annotated proofs. All new
+helper modules were included. The number of main annotated proofs is
+unchanged: the two computational directions are still open, and the final
+equivalence remains conditional on them.
+The original `tests/Evaluator.lean` also passed again after this checkpoint.
+
+## Concrete next implementation step
+
+The evaluator is still a Lean function, and adding more polynomial lemmas
+will not construct its TM2 machine. A useful direct route is a proof-only
+structured stack-program language with push/pop/peek/load, sequence, finite
+state branching, and while loops. Compile it to finite TM2 labels drawn from
+the program's syntax tree. A continuation-based compiler can use a finite
+label type recursively (Unit for a leaf, sums for sequence/branch/loop), with
+each leaf jumping to its supplied continuation. Prove the compiler by
+induction on a terminating big-step derivation, with a coarse step bound.
+This avoids relying on mathlib's unproved polytime-composition assertion.
+Then implement the actual table, tuple, decoder, and evaluator operations in
+that language and transfer the already proved work bounds with polynomial
+overhead. This route is proposed, not implemented yet.
