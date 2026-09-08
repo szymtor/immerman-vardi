@@ -1016,3 +1016,61 @@ Lean axioms. Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color`
 passed in 10m39s (kernel replay 10m22s), with eight concepts and eight
 annotated proofs. Concepts remain unchanged from cf16245. The reverse
 definability theorem and final submission are still pending.
+
+## Concrete first-order input positions and bits
+
+The segment plan now has actual Lean definitions and actual FO syntax:
+
+- `InputSegments.Segment` distinguishes the size header, header delimiter,
+  each relation table, each query-coordinate unary block, and its delimiter.
+  Segment arities are fixed by the vocabulary/query arity. Local enumerations
+  use precisely the approved lexicographic tuple tables and unary blocks.
+  `word_eq_encode` proves equality with the frozen concept encoding, including
+  empty universes and nullary relations. `positions_nodup`, `ids_injective`,
+  and `ids_bit` provide distinct initial identifiers and their exact bit values
+  for every input-list index. These identifiers fit the existing NodeInput API.
+- `InputSegmentFormulas.valid` and `.symbol` are actual first-order formulas,
+  with semantic correctness: local membership is unrestricted except for
+  coordinate blocks, and symbols are true/false or the relevant relation atom.
+- `InputTupleCodes` gives every segment a distinct fixed numeral tag and
+  pads its coordinates with zeros. `width σ = σ.sum + 1` suffices for all
+  local arities. For domain size at least `2 + σ.length + 2*m`, `code` is
+  injective into tuples of length `width σ + 1`. `presentation` uses actual
+  numeral, validity, and padding formulas; its semantics is proved.
+- `InputPositionFormulas.eval_position` proves that a finite disjunction of
+  segment presentations defines exactly the tuple codes of input positions.
+  `InputBitFormulas.eval_hasBit` proves that its labeled version defines
+  exactly the positions carrying either specified bit. Both are first-order,
+  uniformly in all structure sizes above the fixed tag threshold. No flat
+  address arithmetic is an expressibility assumption.
+
+These modules compile. The next missing input component is the parent-link
+interpretation: first position, consecutive positions, and last position
+must be recognized by actual formulas and connected to NodeInput.records.
+A direct option is to prove the coded position list strictly lexicographically
+increasing: segment tags increase, and each local enumeration increases in
+tuple order. Then first/last/successor are the usual order predicates
+restricted by the already proved `position` formula. Unlike raw tuple
+successor, restricted successor skips unused tags, padding gaps, empty
+coordinate segments, and zero-sized relation tables. Prove its correspondence
+with adjacent list indices before using it as a stack parent relation.
+This ordering/link interpretation is not yet implemented. Finite transition
+rules, query-prefix isolation, polynomial horizons, and the reverse theorem
+also remain pending; the submission is not ready.
+
+Validation: `tests/InputInterpretation.lean` passes exact-word examples for
+a mixed nullary/unary vocabulary, empty and maximal unary query blocks, and
+an empty universe, plus symbolic identifier/bit and actual-formula checks.
+All six audited theorem sets contain only standard Lean axioms. The five
+modules and their dependencies compile. Full
+`env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in 15m03s
+(kernel replay 13m37s), with eight concepts and eight annotated proofs.
+The approved concept files remain identical to cf16245.
+
+Integration detail checked in mathlib: the polynomial-time witness stores
+`inputAlphabet : tm.Γ tm.k₀ ≃ Bool` and the actual input is
+`(encode A).map inputAlphabet.invFun`. Its length equals the bit-word length;
+transport `InputSegments.ids` across that length equality and label initial
+records by the inverse alphabet image of the proved bit. Likewise the
+accepting output symbol is `outputAlphabet.invFun true`. Do not assume the
+machine's alphabet types are definitionally Bool.

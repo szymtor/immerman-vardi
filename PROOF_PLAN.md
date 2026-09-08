@@ -226,3 +226,14 @@ nodes, encode finite controls/symbols and bounded node/time addresses, compile
 the explicit transition cases to positive rules, separate pointed parameters,
 and patch small domains. See the latest `CURRENT_STATE.md` section; no
 expressibility or rule-to-machine correspondence is assumed.
+
+The concrete input-position and symbol interpretation is now proved in
+`InputSegments`, `InputSegmentFormulas`, `InputTupleCodes`,
+`InputPositionFormulas`, and `InputBitFormulas`. It preserves the exact
+approved word, supplies injective segment/local-coordinate identifiers, and
+defines their padded tuple codes and bit labels by actual first-order syntax.
+The remaining initial-node obligation is first/last/successor on this finite
+position set and its correspondence with the adjacent entries used by
+`NodeInput.records`. Use restricted lexicographic order on the coded positions
+so that empty segments and padding gaps are skipped. This link interpretation
+must be proved before the initial positive node rules can be instantiated.

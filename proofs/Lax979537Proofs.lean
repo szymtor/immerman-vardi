@@ -80,3 +80,8 @@ import Lax979537Proofs.NodeInput
 import Lax979537Proofs.NodeTrace
 import Lax979537Proofs.NodeClosure
 import Lax979537Proofs.NodeAcceptance
+import Lax979537Proofs.InputSegments
+import Lax979537Proofs.InputSegmentFormulas
+import Lax979537Proofs.InputTupleCodes
+import Lax979537Proofs.InputPositionFormulas
+import Lax979537Proofs.InputBitFormulas
