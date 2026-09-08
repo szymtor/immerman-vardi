@@ -62,3 +62,32 @@ Connect these constructions to concrete machines. The rule compiler currently
 has no additional free parameters inside its rules; pointed input parameters
 must be handled when instantiating it, or the proof-only compiler generalized.
 No change to the approved concept syntax is needed for that generalization.
+
+## Concrete machine bridge
+
+`StackProgram` now implements the direct compiler route: structured programs
+over TM2 push/pop/peek/load, sequence, branch, and while. The compiled label
+type is finite by recursion on the syntax tree. `compile_correct` is proved
+by induction on terminating executions, and `program_polytime` transfers
+polynomial execution bounds to the exact `TM2ComputableInPolyTime` interface.
+It requires the actual input/output convention, reset control, and empty work
+stacks. It does not assume mathlib's missing machine-composition theorem.
+
+`StackTransfer.transfer_executes` moves bits while preserving auxiliary
+control and unrelated stacks. `reverse_polytime` exercises the full compiler
+and polynomial-time interface. `StackUnary.parse_executes` parses the size
+header into a unary counter, preserves the remaining input, and distinguishes
+a delimiter from exhaustion; `splitUnary_correct` links it to the existing
+decoder. These routines are actual compiled stack programs.
+
+Next, implement preserving copy, unary-counter comparisons, and repetition
+controlled by a copied unary bound. Store domain/tuple coordinates as unary
+counters on separate stacks, and relations as dense bit tables. This avoids
+word-size simulation work: even full table scans and unary arithmetic cost
+only polynomial overhead for fixed arities. Formula recursion chooses a fixed
+finite collection of stacks and control bits. Quantifier loops range over n;
+LFP loops use k nested n-bounded counters to generate tuples and run n^k
+stages. Each stage stores its full new table before advancing. Prove program
+invariants and correctness, then transfer coarse polynomial bounds through
+`program_polytime`. The full evaluator is still not implemented in this
+language.

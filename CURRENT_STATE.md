@@ -154,15 +154,47 @@ The original `tests/Evaluator.lean` also passed again after this checkpoint.
 
 ## Concrete next implementation step
 
-The evaluator is still a Lean function, and adding more polynomial lemmas
-will not construct its TM2 machine. A useful direct route is a proof-only
-structured stack-program language with push/pop/peek/load, sequence, finite
-state branching, and while loops. Compile it to finite TM2 labels drawn from
-the program's syntax tree. A continuation-based compiler can use a finite
-label type recursively (Unit for a leaf, sums for sequence/branch/loop), with
-each leaf jumping to its supplied continuation. Prove the compiler by
-induction on a terminating big-step derivation, with a coarse step bound.
-This avoids relying on mathlib's unproved polytime-composition assertion.
-Then implement the actual table, tuple, decoder, and evaluator operations in
-that language and transfer the already proved work bounds with polynomial
-overhead. This route is proposed, not implemented yet.
+The direct structured stack-program compiler is now implemented and checked:
+
+- `StackProgram`: explicit structured syntax over the TM2 operations, finite
+  syntax-tree label types, continuation compilation, counted terminating
+  executions, and `compile_correct` for arbitrary label embeddings.
+- `StackProgram.machine` is an actual `Turing.FinTM2`, and
+  `program_polytime` produces exactly `TM2ComputableInPolyTime` from a
+  polynomial bound on these program executions. It also requires the correct
+  input/output stack convention, work-stack cleanup, and finite-control reset.
+- `StackTransfer`: a compiled linear bit-transfer routine with arbitrary
+  auxiliary finite state and framed unrelated stacks; `reverse_polytime`
+  proves an end-to-end instance of the exact complexity interface.
+- `StackUnary`: a compiled linear unary-header parser. It consumes the
+  delimiter, preserves the remaining input, stores the count on a separate
+  stack, and signals a missing delimiter. `splitUnary_correct` connects it
+  to the existing executable `Decoding.readUnary`; `parse_executes` is proved
+  for arbitrary inputs, not only well-formed ones.
+
+No imported `proof_wanted` assertion or Lax assumptions are used in this
+compiler. The compiler is general, but it does NOT yet contain the formula
+evaluator. Continue with preserving copy, unary comparisons, bounded loops,
+dense-table lookup, and the formula evaluator in this structured language.
+Use unary counter stacks and generous table scans to avoid unnecessary
+word-size bounds. See the detailed continuation plan in `PROOF_PLAN.md`.
+
+The reverse expressive direction also remains open; the concrete TM2-to-
+tableau instantiation has not advanced in this compiler iteration.
+
+Validation for this iteration: `StackProgram`, `StackTransfer`, and
+`StackUnary` compile. `tests/StackMachine.lean` passed: it directly runs
+compiled machines on reversal, branching, nested loops, and valid/malformed
+unary headers. The six audited results use at most propext, Classical.choice,
+and Quot.sound; `splitUnary_correct` uses no axioms. Full Lax replay passed in
+3m46s (kernel replay 3m26s), with eight concepts and seven annotated proofs.
+All three new machine modules were included. The two main computational
+directions remain open; this successful replay does not close them.
+
+Implementation detail for the next copy routine: move `src` into an empty
+temporary stack using `transfer`; then pop that temporary stack while pushing
+each saved bit onto both `src` and `dst`. This restores `src`, prepends the
+same bit string to `dst`, and clears the temporary stack. A three-stack store
+invariant and pairwise-distinct indices suffice; all other stacks and the
+Aux part of finite control remain framed. Such a linear preserving copy then
+supports unary-bound loops and non-destructive table scans.

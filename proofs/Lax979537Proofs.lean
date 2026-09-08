@@ -16,3 +16,6 @@ import Lax979537Proofs.PositiveRules
 import Lax979537Proofs.TupleAddresses
 import Lax979537Proofs.AddressFormulas
 import Lax979537Proofs.FiniteExceptions
+import Lax979537Proofs.StackProgram
+import Lax979537Proofs.StackTransfer
+import Lax979537Proofs.StackUnary
