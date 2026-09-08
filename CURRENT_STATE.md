@@ -490,3 +490,71 @@ bound. Audited new theorems use only standard Lean axioms. Full
 eight concepts and seven annotated proofs, still six unconditional concept
 proofs and the conditional final assembly. Concepts remain identical to
 cf16245, both main directions remain open, and nothing was submitted.
+
+## Tuple traversal and materialized table rounds
+
+The machine now has the following further proved constructions:
+
+- `StackTuples.forTuples_executes` nests the domain loop at a fixed list of
+  counter/coordinate pairs. Its callback executes once per tuple, in order,
+  with a uniform bound B. It restores every loop stack and clears scratch.
+  Semantic payload changes are specified by `foldTuples`; the callback
+  preserves the active tuple and remaining loop counters. It is required
+  only for tuples whose coordinates are below n.
+- `tuples_eq_canonical` proves that this order is precisely the list in the
+  approved `StructureEncoding.tuples`, observed as lists of natural-number
+  coordinate values. `foldTuples_eq_foldl` identifies callback accumulation
+  with its ordinary list fold. Nullary traversal executes once, even over
+  n = 0; positive arity over n = 0 executes no callbacks.
+- `StackTuples.costPolynomial` proves polynomial bounds for actual compiled
+  executions, given a polynomial bound on the callback. The polynomial is
+  fixed by the arity and callback bound. `packTuple_state`, `packTuple_fresh`,
+  `packTuple_setStack`, and scratch-normalization lemmas support composing
+  callbacks with independent input and output stacks.
+- `StackMaterialize.materialize_executes` runs a Boolean evaluator for
+  each tuple, stores each answer once in a reverse buffer, then transfers
+  the completed dense table into canonical order. The theorem restores all
+  stacks except the output, where it prepends the table to prior contents.
+  The reverse buffer is required initially empty and is returned empty.
+  Its body premise is a concrete bounded `StackBoolean.Returns` execution
+  for each valid tuple and arbitrary already-emitted rows. `table_length`
+  and `eval_costPolynomial` connect the result and cost to n^k.
+- `StackTableRound.round_executes` constructs a complete next table while
+  retaining the old current table for body evaluation. It then clears the
+  old table and installs the new table, using two transfers to preserve
+  canonical order. All buffers and loops are restored. The bound depends
+  polynomially on the callback cost, n^k, and old-table length; no bound is
+  assumed on how many rows of the new table differ from the old one.
+
+These are actual machine primitives for materialized LFP evaluation, not
+the full LFP compiler or either main concept theorem. The next substantial
+forward steps are table access, bounded iteration of the table-round program
+for n^k stages starting from the all-false table, and formula induction with
+a finite workspace. The previous claim that tuple traversal and individual
+table rounds were still unimplemented is superseded by this checkpoint.
+
+A direct stage-loop construction can reuse `StackPower` to prepare a unary
+n^k bound, `StackFor.forValues` to run a fixed table-round body under that
+bound, and `StackClear` for cleanup. Its semantic fold is ordinary iteration
+of the table transformer. The loop's extra unary round coordinate is harmless
+polynomial overhead; no precise bound or optimized counter representation is
+needed. The initial all-false table can be materialized with `answer false`.
+For table access, either full scans with tuple matching or unary tuple rank
+followed by the existing indexed lookup suffice. The latter can use Horner
+updates `index := n * index + coordinate` implemented by bounded copies.
+These are next implementation options, not proved constructions yet.
+
+`tests/TupleMachine.lean` checks actual compiled tuple enumeration for
+arities/domain sizes 0–3, and table construction for arities 0–2/domain sizes
+0–3. It verifies order, emitted values, all private-stack cleanup, retained
+domain data, and populated unrelated stacks. A symbolic proof instantiates
+the materializer with the existing atomic comparison evaluator for every n,
+producing the full table of x < y with the derived bound. Round tests check
+that the old table remains available throughout construction and that a
+nonconstant new table is installed without reversal. All tests pass, and
+axiom audits use only standard Lean axioms. Full
+`env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in 7m14s
+(kernel replay 6m56s), including all three new modules. Concepts remain
+identical to cf16245. Lax still reports eight concepts and seven annotated
+proofs: the final assembly depends on the two open computational directions.
+No submission was made; the full goal remains active.

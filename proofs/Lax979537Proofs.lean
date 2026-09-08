@@ -43,3 +43,6 @@ import Lax979537Proofs.StackRename
 import Lax979537Proofs.StackBoolean
 import Lax979537Proofs.StackAtomic
 import Lax979537Proofs.StackExists
+import Lax979537Proofs.StackTuples
+import Lax979537Proofs.StackMaterialize
+import Lax979537Proofs.StackTableRound

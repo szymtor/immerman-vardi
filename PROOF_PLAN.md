@@ -126,6 +126,16 @@ programs into larger layouts while preserving extra stacks at unchanged cost.
 Tuple iteration, relation access, materialized LFP evaluation, and the general
 formula induction remain. These helpers are not a completed forward theorem.
 
+Tuple traversal and individual table rounds are now implemented.
+`StackTuples.forTuples_executes` proves fixed-arity nested iteration with
+canonical-order fold semantics and a polynomial execution bound.
+`StackMaterialize.materialize_executes` constructs the dense table of a
+bounded Boolean evaluator, restoring its reverse buffer and loop workspace.
+`StackTableRound.round_executes` retains the old table while constructing the
+new one, then replaces it in canonical order and cleans the buffers.
+Table access, n^k-stage iteration from the all-false table, and the general
+formula compilation proof still remain. The reverse simulation is unchanged.
+
 For the reverse direction, assess a direct persistent-stack encoding before
 adding a full single-tape simulator. A TM2 configuration can be represented
 by time, finite control/label, and one node pointer per stack. Initial input
@@ -138,3 +148,26 @@ it still requires finite reachable alphabet support, bounded node addresses,
 input interpretation, macro-step refinement, and soundness/completeness of
 the closure. It may avoid forcing TM2 into the existing local-cell tableau
 helper, whose fixed neighborhood does not directly describe linked stacks.
+
+For the persistent-stack candidate, the initial input nodes can be keyed by
+encoding block and local tuple/element coordinates instead of by a flat
+numeric bit offset. Unary header nodes, their delimiter, each relation-table
+block, and each pointed-coordinate unary block have fixed tags. Successors
+inside a table use the existing FO tuple successor; successors across block
+boundaries use the next block's first node. Unary coordinate bits are guarded
+by x < a_i. Nullary table blocks have one node. Pad local coordinates with
+zeros to a common fixed arity. Fixed tags and any required padding constants
+are available above a fixed domain threshold, with smaller domains handled
+by the proved finite-exception theorem. This would avoid implementing FO
+arithmetic for the variable sums of block lengths. It remains a construction
+plan, not a proved input-interpretation lemma.
+
+The existing parameter-free positive-rule compiler can also be used without
+changing its interface: include the pointed query tuple as a prefix of every
+fact, and repeat that prefix in every head and premise. The closure then
+computes all pointed runs simultaneously, and the final formula tests the
+acceptance fact with its free tuple as that prefix. Proving that facts never
+mix different prefixes is part of the simulation invariant. Node keys can
+distinguish initial nodes from push nodes, whose remaining key is the time
+tuple and a fixed instruction-position tag. None of these choices changes
+the approved theorem or the finite-TM2 model.
