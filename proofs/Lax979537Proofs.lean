@@ -38,3 +38,8 @@ import Lax979537Proofs.DecoderSoundness
 import Lax979537Proofs.RawDecoding
 import Lax979537Proofs.DecoderAgreement
 import Lax979537Proofs.DecoderCorrectness
+import Lax979537Proofs.StackFor
+import Lax979537Proofs.StackRename
+import Lax979537Proofs.StackBoolean
+import Lax979537Proofs.StackAtomic
+import Lax979537Proofs.StackExists

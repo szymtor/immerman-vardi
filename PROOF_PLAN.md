@@ -117,6 +117,15 @@ invariants and correctness, then transfer coarse polynomial bounds through
 `program_polytime`. The full evaluator is still not implemented in this
 language.
 
+The first evaluator combinators are now proved: `StackFor` gives an ordered
+domain loop with callback semantics and cleanup; `StackBoolean` composes
+stack-restoring Boolean evaluators; `StackAtomic` handles unary equality and
+order, including aliased input ports; and `StackExists` compiles existential
+quantification given a bounded body evaluator. `StackRename` embeds verified
+programs into larger layouts while preserving extra stacks at unchanged cost.
+Tuple iteration, relation access, materialized LFP evaluation, and the general
+formula induction remain. These helpers are not a completed forward theorem.
+
 For the reverse direction, assess a direct persistent-stack encoding before
 adding a full single-tape simulator. A TM2 configuration can be represented
 by time, finite control/label, and one node pointer per stack. Initial input

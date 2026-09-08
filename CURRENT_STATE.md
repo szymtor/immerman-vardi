@@ -431,3 +431,62 @@ agreement/correctness axioms audited. Full
 concepts and seven annotated proofs. The decoder obligation is complete,
 but the two main computational directions remain open and the final theorem
 is still conditional on them. No concepts changed and nothing was submitted.
+
+## Evaluator machine combinators
+
+The forward direction now has these additional verified stack programs:
+
+- `StackFor.forValues_executes`: copy a domain counter, visit unary
+  coordinates 0 through n-1 in order, execute a bounded callback at each
+  valid coordinate, and clean the private counter/coordinate/temporary slots.
+  The result is specified by `foldRange`, identified with the ordinary list
+  fold by `foldRange_zero_eq`. The callback may change a semantic payload,
+  represented by an arbitrary family of stores; it preserves loop counters.
+  This proves one-coordinate iteration, not yet arbitrary tuple iteration.
+- `StackRename.rename_executes` and `executes_in_sum`: inject a program into
+  a larger stack layout at unchanged execution cost, preserving every extra
+  stack. This allows the complete decoder to run alongside evaluator ports.
+- `StackBoolean.Returns`: the evaluator contract returns a Boolean in the
+  existing control register, resets spare/scratch registers, preserves outer
+  auxiliary state, and restores every stack. `binary_returns` and
+  `negate_returns` implement Boolean composition with saved answers on a
+  stack, whose previous contents are restored as well.
+- `StackAtomic.lessValue_returns` and `equalValue_returns`: evaluate order
+  and equality of unary coordinate counters with polynomial execution bounds
+  and full stack restoration. Repeated-variable cases are handled by a
+  static port-equality branch, so x = x and x < x are covered.
+- `StackExists.existsValues_returns`: run a bounded Boolean evaluator once
+  for each domain element, accumulate disjunction, and restore all stacks,
+  including prior accumulator contents. It returns `(List.range n).any b`,
+  with `any_range_iff` connecting this to existential truth. The body proof
+  is required only for i < n; n = 0 returns false without running the body.
+
+All these are actual `StackProgram` executions and hence transfer through
+the existing verified TM2 compiler. They are not yet the recursive compiler
+for every admissible FO(LFP) formula. Program syntax depends only on fixed
+ports and subprograms; n and the semantic predicate occur only in proofs.
+
+Next: develop tuple enumeration/table access and materialization, then
+compile formula syntax with a finite private workspace and a representation
+invariant for free elements and bound relations. The quantifier combinator
+already provides the machine construction for `exists'`, conditional on the
+recursive body evaluator contract. A useful layout has fresh coordinates,
+saved Boolean slots, and LFP table buffers allocated by syntax; `StackRename`
+handles enlarged layouts without duplicating decoder proofs. Dense relation
+access may use full scans; coarse polynomial overhead remains sufficient.
+Both main concept obligations are still open, and submission is pending.
+
+`tests/EvaluatorMachine.lean` passes. It runs actual compiled machines for
+ordered domain traversal (n = 0–5), equality/order for all pairs of lengths
+0–4, and existential equality for domain sizes 0–4 and parameter values 0–5.
+It checks complete stack restoration, including populated saved-answer
+stacks. Four valid/malformed inputs exercise the full decoder after port
+renaming into a larger layout with populated extra stacks. A symbolic proof
+also composes `equal_returns` with `existsValues_returns` for arbitrary n,m:
+the resulting program returns `decide (m < n)` with its derived execution
+bound. Audited new theorems use only standard Lean axioms. Full
+`env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in 7m07s
+(kernel replay 6m55s), including all five new proof modules. Lax reports
+eight concepts and seven annotated proofs, still six unconditional concept
+proofs and the conditional final assembly. Concepts remain identical to
+cf16245, both main directions remain open, and nothing was submitted.
