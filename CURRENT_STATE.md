@@ -1251,3 +1251,73 @@ guard. `map_update`, `get_heads`, `update_heads`, and `fresh_code` supply the
 assignment/semantic equalities needed for the two head interpretations.
 Prove soundness via the actual push constructor and `NodeClosure.closure_fixed`,
 following `PlainClosure.preserves`; derive both heads following `derives`.
+
+## All concrete transition rules and trace derivation (working tree)
+
+The push/read construction above is now implemented. Twenty new modules
+compile and are imported into the proof root:
+
+- `PushEffects`, `PushPatterns`, `PushRules`, `PushValues`, and `PushClosure`
+  construct the two push conclusions and prove their exact rule
+  interpretation, encoded-trace preservation, and bounded-step derivation.
+- `ReadEffects` proves the actual pop/peek transitions. `ReadSymbols` derives
+  a finite enumeration for each stack's supported symbols without requiring
+  its alphabet type to be finite.
+- `EmptyHead`, `EmptyReadRules`, and `EmptyReadClosure` compile the all-zero
+  empty-head guard and prove soundness and derivation for empty pop/peek.
+- `RuleExtension`, `ReadPatterns`, and `NonemptyPatterns` supply one parent
+  tuple and the configuration/node patterns for a nonempty read.
+  `ReadRecordValues` decodes an encoded node premise's key, symbol, and
+  parent and excludes configuration/node tag collisions.
+- `NonemptyReadRules` enumerates supported symbols and requires both a
+  source configuration and a positive node-record premise.
+  `NonemptyReadClosure` proves preservation and derivation for both nonempty
+  pop and peek, including the actual head update for pop.
+- `TransitionRules` combines all five lists: plain, push-configuration,
+  push-record, empty-read, and nonempty-read. `preserves` proves their whole
+  operator preserves the actual encoded trace.
+- `ReadDerivation` handles either read shape. `TransitionDerivation.step`
+  proves every bounded `NodeMachine.Step` is derived from its configuration
+  and heap premises. `added` derives every emitted node record.
+- `TransitionClosure.at_time` proves, by induction on canonical snapshots,
+  that a relation closed under these concrete transition rules and containing
+  the initial configuration and records contains every bounded snapshot and
+  heap. `encoded_subset` gives containment of the whole encoded trace.
+
+The seed hypotheses in `TransitionClosure` are ordinary closure-principle
+hypotheses. They are NOT a completed initialization compiler or an assumption
+to use in the final theorem. Concrete initialization rules must still prove
+them for the actual LFP. The final theorem retains its reverse assumption;
+the submission is not ready.
+
+The project build passed in 7s (session 3454). The new transition regression
+passed (session 83702), checking two distinct pushed Nat values in an infinite
+internal alphabet, pop versus peek and preservation of other stack heads,
+and impossibility of a nonempty read when the relation has configuration-tagged
+facts only. All seventeen audited theorem sets use only standard Lean axioms.
+Approved concepts remain unchanged from cf16245, and `git diff --check` passes.
+A targeted kernel replay of all twenty new modules passed (session 65438,
+exit 0). Each new module's declarations were replayed against its imports;
+this is not a fresh full-root replay. The previous complete replay remains
+7175e4e, and the preceding sixteen-module checkpoint was individually
+replayed at 8874a8f. All validation processes for this checkpoint are terminal.
+
+Next implement five initialization templates: one configuration rule guarded
+by first clock and first input position, and four node rules (bit false/true
+times successor-parent/final-empty-parent). `InputBitFormulas.eval_hasBit`,
+`InputLinkFormulas.eval_first/next/last`, and `InitialInput.heap_iff/head_iff`
+already give their semantic interfaces. The input-position code has width
+`InputTupleCodes.width σ + 1`; `HeadPatterns.fresh zero one position` can
+represent an initial node by using tag one rather than the time-node tag two.
+The record symbol is `Sigma.mk tm.k₀ (inputAlphabet.symm bit)`.
+
+For the initial configuration, use an existential clock tuple guarded by
+`AddressFormulas.first`; its address is zero, so `ControlValues.clock_of_address`
+identifies it with `TupleCoding.clock 0`. This avoids a separate all-zero-clock
+arithmetic lemma. The stack heads are all empty except `tm.k₀`, whose head is
+the first input node. The position list is always nonempty (its header-end
+segment supplies a position, even at size zero); `SortedLinks.first_iff` at
+index zero can supply the needed first position. After proving initialization
+soundness and seed membership, combine its rules with `TransitionRules`, use
+`TransitionClosure.encoded_subset` and leastness to prove exact LFP equality,
+define output acceptance, and apply the existing small-domain patch.

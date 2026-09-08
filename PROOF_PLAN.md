@@ -271,3 +271,20 @@ Then assemble their finite list, identify its LFP with `TraceCodes.encoded`,
 read the accepting output, and integrate finite small-domain exceptions.
 Only after that may the final reverse assumption be removed and the
 authorized submission completed.
+
+All transition families are now concrete and proved. `TransitionRules.rules`
+combines plain transitions, the two push conclusions, and empty/nonempty
+pop/peek. Its operator preserves the actual encoded trace.
+`TransitionDerivation.step` and `added` derive every bounded semantic step
+and emitted record. `TransitionClosure.encoded_subset` proves that any
+relation containing the initial configuration/records and closed under the
+concrete transition rules contains the whole encoded canonical trace.
+
+The next obligation is the concrete initialization compiler, not another
+transition simulation. Use one first-clock/first-input-position configuration
+rule and four bit/parent-shape node rules. Prove their operator yields exactly
+the encoded initial facts, then combine them with the transition list and
+discharge `TransitionClosure`'s seed hypotheses for the actual least fixed
+point. Those hypotheses must not become final theorem assumptions. Acceptance
+extraction and the existing small-domain patch then complete the reverse
+direction, subject to full validation and the authorized submission.
