@@ -52,3 +52,9 @@ import Lax979537Proofs.StackTableStages
 import Lax979537Proofs.StackLfpTables
 import Lax979537Proofs.DenseTables
 import Lax979537Proofs.StackSemanticRounds
+import Lax979537Proofs.StackHorner
+import Lax979537Proofs.StackIndex
+import Lax979537Proofs.TupleRank
+import Lax979537Proofs.StackReadBit
+import Lax979537Proofs.StackTableLookup
+import Lax979537Proofs.StackLfpValue

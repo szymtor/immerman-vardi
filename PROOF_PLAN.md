@@ -146,6 +146,17 @@ valid tuple in the represented current relation. Table lookup, the general
 formula compiler, and final output/cleanup assembly remain for the forward
 direction. These results do not close either main concept axiom.
 
+Table access is now proved in `StackHorner`, `StackIndex`, `TupleRank`,
+`StackReadBit`, and `StackTableLookup`. Unary Horner addresses select exactly
+the canonical tuple's bit, and the complete atomic lookup restores every
+input and workspace stack. `StackLfpValue` combines materialized rounds,
+final tuple lookup, and deletion of the private relation table into the same
+Boolean-return contract as the other formula constructors. All individual
+raw-formula constructors now have machine implementations; the general
+finite-workspace compiler and its representation/correctness induction are
+the next main forward obligation. See the latest section of `CURRENT_STATE.md`
+for a recursive finite workspace type and the intended compiler invariant.
+
 For the reverse direction, assess a direct persistent-stack encoding before
 adding a full single-tape simulator. A TM2 configuration can be represented
 by time, finite control/label, and one node pointer per stack. Initial input

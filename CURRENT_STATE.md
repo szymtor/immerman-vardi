@@ -626,3 +626,113 @@ zero the index is zero. `StackLookup.skip_executes` already supports the
 evaluation control type, so a Boolean-returning final pop and cleanup can
 reuse it without a general change-of-control compiler. This is the next
 implementation plan, not a proved lookup constructor yet.
+
+## Tuple lookup and complete LFP value constructor
+
+The planned table-access constructor is now implemented:
+
+- `StackHorner.step_executes` performs one unary update n*a+v by moving
+  the old index into a counter, copying the domain once per token, and
+  copying the coordinate. Source counters and all temporary stacks are
+  restored. No input-dependent value is captured in a control function.
+- `StackIndex.build_executes` folds these updates over a fixed coordinate
+  port list. Ports may repeat. Starting from zero, its execution cost is
+  bounded by a polynomial depending only on tuple arity.
+- `TupleRank.rank_address` identifies the Horner result with the existing
+  big-endian tuple address. `canonical_at_address` proves that this index
+  selects the exact tuple from the approved canonical enumeration; it is
+  proved by constant-length block lookup, not assumed from lexicographic
+  order. `table_at_rank` gives the selected dense relation bit.
+- `StackReadBit.readBit_executes` copies a table, skips a unary index,
+  returns the bit (false on exhaustion), and clears the copied suffix and
+  index. The original source table and unrelated stacks are preserved.
+- `StackTableLookup.lookup_returns` combines rank construction with this
+  read into an actual bounded Boolean evaluator for arbitrary dense
+  relations. It handles repeated arguments and nullary relations and
+  restores every stack, including all private lookup workspace.
+- `StackLfpValue.evaluate_returns` completes the LFP machine constructor:
+  initialize the false table, perform n^k materialized rounds, read the
+  queried tuple, and delete the final private table. The result is membership
+  in `TableEvaluation.rounds`, and every original stack is restored. The
+  recursive body contract is a bounded actual Boolean execution for each
+  Fin-valued tuple in the represented current relation. No simulation or
+  stage-loop correctness assumption replaces that recursive body contract.
+
+The forward compiler now has machine constructors for every raw formula
+case: constants, equality/order, input and bound relation lookup, negation,
+conjunction, existential quantification, and materialized LFP evaluation.
+The general formula compilation/representation induction and final decoder,
+cleanup, and output composition still need to be implemented. This does not
+yet prove `evaluationInP`. The reverse simulation and submission are open.
+
+`tests/LookupMachine.lean` runs compiled machines for unary Horner steps,
+three-coordinate index construction with repeated ports, copied table reads
+including empty/exhausted tables, and complete tuple lookups at arities 0–3.
+It checks the complete LFP value constructor on the constant monotone
+transformer x < y, including repeated query arguments and final table cleanup.
+The tests cover small and empty domains where the corresponding tuple exists,
+and verify populated unrelated stacks. All tests pass. The new theorem axiom
+audits report only standard Lean axioms. Full
+`env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in 9m24s
+(kernel replay 8m54s), including all six new modules. Concepts remain identical
+to cf16245. Lax still reports eight concepts and seven annotated proofs;
+both main computational directions remain open and the final assembly is
+conditional on them. Nothing was submitted.
+
+## Next: general formula compiler
+
+Compile `RawFormula σ m ρ` with the existing evaluation control type and a
+workspace fixed solely by syntax. A useful implementation avoids natural
+offset arithmetic: define a finite `Work φ` type recursively. Use separate
+constructors for a conjunction's saved bit/left/right work, an existential's
+counter/coordinate/tmp/accumulator/child work, and an LFP's seven core ports,
+power counters indexed by Fin k, tuple counters/coordinates indexed by Fin k,
+and child work. Leaf equality/order and table lookup use fixed finite work
+types. Derive Fintype/DecidableEq recursively. The compiler can then accept
+an injective port map `Work φ → K` into any ambient layout. Constructor
+disjointness supplies private-port freshness without proving arithmetic
+facts about cumulative workspace offsets. This compiler is not written yet.
+
+The general invariant should represent a structure A, an element environment
+v, and a `TableEvaluation.TableEnv` η by a unary domain stack, unary element
+stacks, canonical input relation tables, and dense tables for bound relations.
+Require private workspace ports to be distinct from all input ports, and
+input relation-table ports to differ from the domain. Full injectivity of
+element ports is unnecessary because the atomic routines support repeated
+arguments; representation consistency already forces aliased values equal.
+All private work stacks start empty. The compiler theorem should quantify
+over arbitrary surrounding stack contents and control state and return
+`StackBoolean.Returns ... (TableEvaluation.evaluate φ A v η)` with a fixed
+polynomial bound. Positivity/admissibility is needed later for semantic
+agreement, not to run the finite-round evaluator.
+
+For the existential case, extend element ports with the private coordinate
+port. For LFP, extend them with the private tuple-coordinate ports and extend
+the relation environment with the private current-table port. A remaining
+generic observation lemma is needed for `packTuple`: reading its i-th
+coordinate port returns the i-th supplied unary tuple value. The existing
+freshness, stack-update, and scratch lemmas handle old input ports and child
+workspace; tests have already discharged coordinate reads at fixed arity.
+
+Suitable recursive bounds are 1 for truth, a coarse linear bound for unary
+comparison, `StackTableLookup.costPolynomial` for relation atoms, sums for
+Boolean composition, `(P + 15) * X + 11` for existential quantification,
+and `StackLfpValue.costPolynomial P k` for LFP. These are actual execution
+bounds, unlike the older abstract `EvaluationWork` charge.
+
+Two interface details should be handled before the compiler induction:
+
+1. Add a coordinate-observation lemma for `packTuple` specialized to
+   `List.ofFn (fun i : Fin k => (counterPort i, coordPort i))` and
+   `List.ofFn values`. Under port distinctness, reading `coordPort i` gives
+   `replicate (values i) true`. Induct on k and split i with `Fin.cases`;
+   the zero case uses `packTuple_fresh` on the tail, and the successor case
+   applies the induction hypothesis to the tail store family. The loop's
+   remaining-counter list need not be bounded to prove this observation.
+2. The current `StackLfpValue.evaluate_returns` expresses semantic arity as
+   `tupleSlots.length`. A small wrapper with explicit k and assumptions
+   `tupleSlots.length = k` and `powerCounters.length = k` will avoid casts
+   when applying it to a raw LFP binder of arity k. Prove that wrapper by
+   substituting k using the first equality and applying the existing theorem.
+   Keep tupleSlots an independent list parameter in the wrapper statement;
+   this makes the substitution straightforward. No concept change is needed.
