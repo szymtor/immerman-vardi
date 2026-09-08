@@ -1074,3 +1074,84 @@ transport `InputSegments.ids` across that length equality and label initial
 records by the inverse alphabet image of the proved bit. Likewise the
 accepting output symbol is `outputAlphabet.invFun true`. Do not assume the
 machine's alphabet types are definitionally Bool.
+
+## Input-stack links and a polynomial tuple-clock horizon
+
+The next initial-graph obligations are now implemented:
+
+- `InputOrder` proves that canonical relation tuples and segment-local
+  enumerations increase lexicographically, that segment tags increase, and
+  that the whole padded position-code list is strictly increasing. Numerical
+  tuple-address ranks inherit this order (`rank_sorted`).
+- `SortedLinks` defines first, last, and restricted successor on a finite
+  ranked list. Under strict ordering, these predicates are exactly index zero,
+  the final index, and adjacent indices. Thus the restricted order correctly
+  skips empty segments and unused/padded tuple codes.
+- `InputLinkFormulas` constructs actual first-order first/last/successor
+  formulas. Its `window` quantifier ranges over valid input positions and
+  optional strict tuple bounds. Both coded-position and arbitrary-assignment
+  correctness theorems are proved; no order/link expressibility assumption
+  remains at this interface.
+- `OrderedRecords.records_iff` proves that the immutable records for a list
+  have exactly its labels and order-defined optional parents. `head_iff`
+  identifies the first position as the head. `RenameRecords` proves that
+  renaming node identifiers maps keys and optional parents in those records.
+- `InitialInput` instantiates the graph for an arbitrary bundled TM2 with
+  `inputAlphabet : tm.Γ tm.k₀ ≃ Bool`. It labels each position by the inverse
+  alphabet image of its bit, proves the exact list is the approved encoding
+  mapped through that inverse, and supplies injective names to NodeInput.
+  `heap_iff` and `head_iff` connect the actual initialized heap/head with the
+  proved position, label, first, and parent relations. `represented_run`
+  connects this concrete graph to the original machine input at every step.
+- `SimulationHorizon.exists_horizon` composes the approved encoding-length
+  polynomial with an arbitrary runtime polynomial and absorbs microstep
+  overhead into a single power. It proves
+  `TM2Micro.factor tm * time.eval (encode A).length ≤ n^d - 1` for every
+  pointed input with `n ≥ 2`. No precise exponent or runtime estimate is
+  required. `exists_deciding_horizon` applies this to any actual
+  `TM2ComputableInPolyTime id (fun b => [b]) f` witness and proves that its
+  concrete positive node closure accepts exactly the output bit `f (encode A)`.
+
+The input interpretation and semantic polynomial-time simulation are now
+connected. The reverse theorem is STILL NOT proved: the finite supported
+control/state/symbol cases and bounded node/time addresses must be encoded
+into fixed-arity facts, and actual positive transition rules must be supplied
+with correctness. Query-prefix isolation (or an explicitly parameterized
+rule compiler) and the existing small-domain patch must then be integrated.
+Do not count `exists_deciding_horizon` as FO(LFP) definability: it concerns
+the concrete semantic closure, whose remaining rule presentation is explicit
+in its documentation. The final theorem still has its one reverse assumption.
+
+All seven new proof modules compile. The extended `tests/InputInterpretation.lean`
+regression passed, including adjacent/nonadjacent positions across an empty
+coordinate block, endpoints, and the uniform actual-formula/adjacent-index
+equivalence. All fourteen audited theorem sets contain only standard Lean
+axioms. The approved concepts are unchanged from cf16245; `git diff --check`
+passes. Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed
+in 16m48s (kernel replay 15m53s), with eight concepts and eight annotated
+proofs. Both replay session 28192 and test session 68188 finished successfully.
+
+Concrete next finite-coding obligations identified from the current sources:
+`TM2MicroSupport.initial_run_support` gives finite control and live-stack
+alphabet support. To code the accumulated heap, also prove finite symbol
+support for old/popped records, by induction using `NodeMachine.step_records`:
+old records retain their support and a new push symbol is in the proved
+machine alphabet. Prove that every nonempty record parent is an existing
+node key; the initial list has this property and fresh pushes point to an
+already represented head. `TimedNodes.Bounded` then bounds parent/head time
+names as well as keys. This supplies the support and boundedness needed for
+injective codes of the entire canonical trace, not just its currently live
+stacks. Initial identifiers already have their proved injective tuple code.
+Do not assume an injective code for arbitrary unbounded raw Fact values.
+
+Compiler interface choice for the next step: use the free element parameters
+already supported by the approved LFP constructor. A parameterized rule can
+extend `PositiveRules.Rule σ k` with a map selecting the query variables from
+its witness assignment. Its actual matrix additionally equates those selected
+variables with the free query tuple; its head and premises remain k-ary facts.
+The resulting body has k bound tuple variables plus m free query variables.
+Prove the resulting membership formula's body operator equals the rule
+operator at that fixed query valuation. This avoids carrying the query tuple
+inside every fact and proving a separate all-query prefix-isolation theorem.
+It changes only the proof compiler, not the approved concepts. This interface
+extension is not implemented yet; it must be proved before it is used.

@@ -1,4 +1,7 @@
 import Lax979537Proofs.InputBitFormulas
+import Lax979537Proofs.InputLinkFormulas
+import Lax979537Proofs.InitialInput
+import Lax979537Proofs.SimulationHorizon
 
 open Lax979537.OrderedStructures Lax979537.StructureEncoding
 open Lax979537Proofs
@@ -50,6 +53,45 @@ example : Function.Injective
     (code (σ := [0, 1]) (m := 2) (n := 8) (by decide) arity_le_width) :=
   code_injective _ _
 
+def testRank : Identifier [0, 1] 2 8 → Nat :=
+  InputOrder.rank exampleInput (by decide) arity_le_width
+
+def positionAt (i : Fin 27) : Identifier [0, 1] 2 8 :=
+  (positions exampleInput).get (Fin.cast (by decide) i)
+
+/-- The empty first coordinate block is skipped between a relation table
+and that coordinate's delimiter. -/
+example : (positionAt 17).1 = .table 1 := by decide
+example : (positionAt 18).1 = .coordinateEnd 0 := by decide
+example : (positionAt 19).1 = .coordinate 1 := by decide
+
+example : SortedLinks.Next (positions exampleInput) testRank (positionAt 17) (positionAt 18) :=
+  (SortedLinks.next_get _ _ (InputOrder.rank_sorted exampleInput (by decide) arity_le_width) _ _).mpr rfl
+
+example : ¬SortedLinks.Next (positions exampleInput) testRank (positionAt 17) (positionAt 19) := by
+  unfold testRank positionAt
+  rw [SortedLinks.next_get _ _ (InputOrder.rank_sorted exampleInput (by decide) arity_le_width)]
+  decide
+
+example : SortedLinks.First (positions exampleInput) testRank (positionAt 0) :=
+  (SortedLinks.first_get _ _ (InputOrder.rank_sorted exampleInput (by decide) arity_le_width) _).mpr rfl
+
+example : SortedLinks.Last (positions exampleInput) testRank (positionAt 26) :=
+  (SortedLinks.last_get _ _ (InputOrder.rank_sorted exampleInput (by decide) arity_le_width) _).mpr rfl
+
+/-- The actual formula matches adjacent indices, for arbitrary parameters
+and variable placements, not only these concrete example structures. -/
+example {σ : Vocabulary} {m v : Nat} (query : Fin m → Fin v)
+    (x y : Fin (width σ + 1) → Fin v) (A : OrderedStructure σ)
+    (hn : tagBound σ m ≤ A.size) (a : Fin v → Fin A.size)
+    (i j : Fin (positions (⟨A, a ∘ query⟩ : PointedStructure σ m)).length)
+    (hx : code hn arity_le_width ((positions ⟨A, a ∘ query⟩).get i) = a ∘ x)
+    (hy : code hn arity_le_width ((positions ⟨A, a ∘ query⟩).get j) = a ∘ y) :
+    Lax979537.FixedPointSemantics.eval (InputLinkFormulas.next (ρ := []) arity_le_width query x y)
+      A a (fun i => Fin.elim0 i) ↔ i.val + 1 = j.val :=
+  (InputLinkFormulas.eval_next_coded _ _ _ _ _ _ _ _ _ _ hx hy).trans
+    (SortedLinks.next_get _ _ (InputOrder.rank_sorted _ hn arity_le_width) i j)
+
 /-- The formula bridge is uniform over vocabulary, query arity, relation
 contents, and every sufficiently large finite ordered universe. -/
 example {σ : Vocabulary} {m v : Nat} (query : Fin m → Fin v)
@@ -67,5 +109,13 @@ example {σ : Vocabulary} {m v : Nat} (query : Fin m → Fin v)
 #print axioms InputTupleCodes.code_injective
 #print axioms InputPositionFormulas.eval_position
 #print axioms InputBitFormulas.eval_hasBit
+#print axioms InputOrder.positions_sorted
+#print axioms InputLinkFormulas.eval_next
+#print axioms OrderedRecords.records_iff
+#print axioms InitialInput.heap_iff
+#print axioms InitialInput.head_iff
+#print axioms InitialInput.represented_run
+#print axioms SimulationHorizon.exists_horizon
+#print axioms SimulationHorizon.exists_deciding_horizon
 
 end InputInterpretationTest

@@ -85,3 +85,10 @@ import Lax979537Proofs.InputSegmentFormulas
 import Lax979537Proofs.InputTupleCodes
 import Lax979537Proofs.InputPositionFormulas
 import Lax979537Proofs.InputBitFormulas
+import Lax979537Proofs.InputOrder
+import Lax979537Proofs.SortedLinks
+import Lax979537Proofs.InputLinkFormulas
+import Lax979537Proofs.OrderedRecords
+import Lax979537Proofs.RenameRecords
+import Lax979537Proofs.InitialInput
+import Lax979537Proofs.SimulationHorizon

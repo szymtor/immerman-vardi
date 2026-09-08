@@ -237,3 +237,13 @@ position set and its correspondence with the adjacent entries used by
 `NodeInput.records`. Use restricted lexicographic order on the coded positions
 so that empty segments and padding gaps are skipped. This link interpretation
 must be proved before the initial positive node rules can be instantiated.
+
+That link obligation is now proved in `InputOrder`, `SortedLinks`, and
+`InputLinkFormulas`. `OrderedRecords` and `RenameRecords` identify the
+order-defined graph with the actual immutable initial records; `InitialInput`
+connects it to the alphabet-converted bundled machine input and its represented
+run. `SimulationHorizon` supplies a coarse tuple-clock horizon and correct
+positive-closure acceptance for every actual polynomial-time witness.
+The main remaining construction is the finite FO(LFP) rule presentation of
+the supported machine transitions, with fixed-arity node/configuration codes,
+parameter separation, and integration of the proved small-domain patch.
