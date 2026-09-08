@@ -247,3 +247,27 @@ positive-closure acceptance for every actual polynomial-time witness.
 The main remaining construction is the finite FO(LFP) rule presentation of
 the supported machine transitions, with fixed-arity node/configuration codes,
 parameter separation, and integration of the proved small-domain patch.
+
+Fixed-arity coding and direct free-query parameterization are now proved in
+`NodeSupport`, `TupleCoding`, `SupportedCodes`, `NodeCodes`, `FactSupport`,
+`FactCodes`, `TraceCodes`, and `ParameterizedRules`. Use this parameterized
+compiler; the older all-query-prefix plan above is superseded. The codes are
+injective on the supported bounded trace, never on all unbounded raw facts.
+`RuleConstants` binds the finite numeral block by actual first-order guards.
+
+The first concrete transition family is complete: `ControlRules` and
+`PlainControl` enumerate the stack-preserving cases, and `PlainClosure`
+proves both encoded-trace preservation and derivation of every corresponding
+bounded step. Reuse `FactPatterns` for the remaining tuple patterns and
+`ControlValues` for decoding configuration premises. Every rule has a clock
+successor guard; the fresh push node uses the source clock.
+
+Next implement push, pop/peek, and initialization rules, with matching
+preservation/derivation lemmas. Push needs separate configuration and record
+heads. Nonempty pop/peek has a positive node premise and finite supported
+typed symbol cases; the empty case explicitly matches the empty-head code.
+Initial node rules use the already proved input bit and next/last formulas.
+Then assemble their finite list, identify its LFP with `TraceCodes.encoded`,
+read the accepting output, and integrate finite small-domain exceptions.
+Only after that may the final reverse assumption be removed and the
+authorized submission completed.

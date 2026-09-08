@@ -1154,4 +1154,100 @@ Prove the resulting membership formula's body operator equals the rule
 operator at that fixed query valuation. This avoids carrying the query tuple
 inside every fact and proving a separate all-query prefix-isolation theorem.
 It changes only the proof compiler, not the approved concepts. This interface
-extension is not implemented yet; it must be proved before it is used.
+extension is now implemented as described below.
+
+## Finite fact coding and parameterized rule compiler (working tree)
+
+Nine additional proof modules compile: `ParameterizedRules`,
+`RuleConstants`, `NodeSupport`, `TupleCoding`, `SupportedCodes`, `NodeCodes`,
+`FactSupport`, `FactCodes`, and `TraceCodes`. They are now imported into
+the root proof module along with the six concrete-rule modules below.
+
+`ParameterizedRules.eval_membership` proves that the actual LFP formula
+denotes the positive rule closure at a fixed free query valuation.
+`RuleConstants.compile_holds` proves correctness of numeral bindings in
+rule templates. Thus query-prefix isolation is no longer needed.
+
+The support proofs cover retained heap records and their parents as well as
+live heads. The coding proofs supply injective fixed-arity tuple codes for
+supported configurations and records within the tuple-clock bound.
+`TraceCodes` instantiates these codes for actual polynomial-time machine
+witnesses and the approved input representation. Its closure encoding and
+membership equivalence concern the semantic closure; they do not yet give
+the concrete finite transition rule list or its syntactic correctness.
+
+The parameterized-rule and finite-fact-code regressions passed. The seven theorem axiom audits in
+`tests/FiniteFactCodes.lean` report only `propext`, `Classical.choice`, and
+`Quot.sound`. The approved concepts remain unchanged, and the final theorem
+still explicitly assumes `VardiImmerman.ptimeDefinable`.
+
+Next: construct concrete initialization and transition rules, prove their
+LFP matches the encoded canonical trace, extract acceptance, and integrate
+the existing small-domain patch. Then discharge the reverse assumption,
+complete validation, and submit. No submission has been made.
+
+## Concrete stack-preserving rules
+
+`FactPatterns` proves that variable-pattern assignment commutes with the
+actual configuration and record tuple layouts. `MachineConstants` supplies
+a fixed numeral block for all machine tags, supported controls/symbols, and
+finite internal states. `ControlRules.transition` is an actual positive rule
+template with query variables, two clock blocks, and shared head variables.
+Its first-order guard requires consecutive tuple addresses.
+`transition_holds` proves its exact interpretation for arbitrary relation
+premises, including all existential witnesses.
+
+`PlainControl.target` handles stopped, enter, load, branch, goto, and halt.
+`target_step` proves that each case is an actual `NodeMachine.Step` for any
+heap and head assignment. `rules` enumerates these cases over the proved
+finite controls and internal states; `operator_iff` proves the exact
+interpretation of that finite concrete rule list.
+
+`ControlValues` decodes a configuration pattern against a supported encoded
+fact and rules out node/configuration tag collisions. `PlainClosure.preserves`
+proves that the concrete rules preserve `TraceCodes.encoded` for every actual
+polynomial-time machine witness and every sufficiently large pointed input.
+`PlainClosure.derives` proves that each supported stack-preserving transition
+before the final clock value is derived from its encoded source fact. These
+are concrete syntax-to-trace results, not a definability assumption.
+
+All fifteen new modules compile and are integrated into the proof root.
+`env LEAN_NUM_THREADS=2 lax build . --no-color` passed in 26s, reporting eight
+concepts and eight annotated proofs. The final annotated equivalence still
+retains its sole reverse assumption. A targeted kernel replay of all fifteen
+new modules passed (session 82371, exit 0); this checks every new module's
+declarations against its imports, and is not a new full-root replay. The
+previous full replay is the successful 7175e4e checkpoint. All validation
+processes for this checkpoint are terminal. Passing regression checks cover literal rule constants, branch
+outcomes and state updates, separation of push from plain rules, and failure
+of the actual transition guard to wrap the final clock back to zero.
+
+The next concrete rule families are push (next configuration plus an emitted
+node record), pop/peek (empty and positive-record cases), and initialization
+(input-bit/link formulas and the first input head). Then combine the families,
+prove equality of their LFP with the encoded canonical trace, extract
+acceptance, and apply `FiniteExceptions.definable_of_above`. The theorem and
+submission remain incomplete.
+
+`HeadPatterns` is also implemented and has passed elaboration and kernel replay.
+It selects and updates one flattened stack-head row, proves that assignment
+commutes with that update, identifies it with `FactCodes.heads` of a machine
+head update, and identifies the fresh-node pattern with the code of the
+source-time node. It has been added to the proof root. The final full project
+build passed in 24s (session 95099), its targeted kernel replay passed
+(session 58550), and the expanded control/head-pattern regression and nine
+axiom audits passed (session 89937). All sixteen new modules are therefore
+integrated and individually kernel-replayed; no claim of a fresh full-root
+replay is made. No validation process remains running.
+
+For push, reuse `ControlRules`' query/before/after/head data layout and source
+configuration pattern. Enumerate supported controls and finite states as in
+`PlainControl.rules`. A push effect contains its stack key, typed pushed
+symbol, and successor instruction. Generate two rules per effect: a next
+configuration with `HeadPatterns.update` at that key using `fresh` on the
+source clock, and a node fact whose parent is `HeadPatterns.get` of the old
+head. Both rules have the same source-configuration premise and successor
+guard. `map_update`, `get_heads`, `update_heads`, and `fresh_code` supply the
+assignment/semantic equalities needed for the two head interpretations.
+Prove soundness via the actual push constructor and `NodeClosure.closure_fixed`,
+following `PlainClosure.preserves`; derive both heads following `derives`.
