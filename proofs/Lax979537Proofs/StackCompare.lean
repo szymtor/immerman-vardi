@@ -151,4 +151,13 @@ theorem less_executes (base : K → List Bool) (left right : K) (hne : left ≠ 
   have hs := residue_size xs ys
   omega
 
+theorem less_store (left right : K) (hne : left ≠ right) (s : BitStore K (Aux × Bool)) :
+    ∃ c, c ≤ 5 * ((s.stk left).length + (s.stk right).length) + 8 ∧
+      Executes (less left right) s
+        ⟨((s.state.1.1, decide ((s.stk left).length < (s.stk right).length)), none),
+          Function.update (Function.update s.stk left []) right []⟩ c := by
+  simpa only [working, Function.update_eq_self, Prod.mk.eta] using
+    less_executes s.stk left right hne (s.stk left) (s.stk right)
+      s.state.1.1 s.state.1.2 s.state.2
+
 end Lax979537Proofs.StackCompare

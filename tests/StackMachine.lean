@@ -2,6 +2,8 @@ import Lax979537Proofs.StackUnary
 import Lax979537Proofs.StackCompare
 import Lax979537Proofs.StackLookup
 import Lax979537Proofs.StackPower
+import Lax979537Proofs.StackReadRelations
+import Lax979537Proofs.StackCoordinate
 
 namespace VardiImmermanStackTests
 
@@ -162,5 +164,84 @@ def powerMachine (k : Nat) : FinTM2 := machine (powerProgram k) 0 1 ((), none)
 
 #print axioms Lax979537Proofs.StackCopy.copy_store
 #print axioms Lax979537Proofs.StackPower.power_executes
+
+def decoderWorkspace : Lax979537Proofs.StackReadRelations.Workspace (Fin 11) where
+  domain := 0
+  input := 1
+  count := 2
+  tmp := 3
+  rev := 4
+  counters := [5, 6]
+  separate := by decide
+  counters_nodup := by decide
+  counter_fresh := by decide
+
+def relationsProgram : BitProgram (Fin 11) (Unit × Bool) :=
+  Lax979537Proofs.StackReadRelations.readTables decoderWorkspace [(0, 7), (1, 8), (2, 9)]
+def relationsMachine : FinTM2 := machine relationsProgram 1 7 (((), true), none)
+
+def checkRelations (n : Nat) (bits : List Bool) (valid : Bool) : Bool :=
+  let s : BitStore (Fin 11) (Unit × Bool) := ⟨(((), valid), some false), fun p =>
+    if p = 0 then List.replicate n true else
+    if p = 1 then bits else if p = 10 then [false, true] else []⟩
+  let fuel := Lax979537Proofs.StackReadTable.cost 0 n +
+    Lax979537Proofs.StackReadTable.cost 1 n + Lax979537Proofs.StackReadTable.cost 2 n + 1
+  let c := runFuel relationsMachine fuel (config (some (entry relationsProgram)) s)
+  c.l.isNone && eqBits (c.stk (0 : Fin 11)) (List.replicate n true) &&
+    eqBits (c.stk (1 : Fin 11)) (bits.drop (1 + n + n ^ 2)) &&
+    eqBits (c.stk (7 : Fin 11)) (Lax979537Proofs.StackTake.paddedPrefix 1 bits) &&
+    eqBits (c.stk (8 : Fin 11)) (Lax979537Proofs.StackTake.paddedPrefix n (bits.drop 1)) &&
+    eqBits (c.stk (9 : Fin 11)) (Lax979537Proofs.StackTake.paddedPrefix (n ^ 2) (bits.drop (1 + n))) &&
+    ([2, 3, 4, 5, 6] : List (Fin 11)).all (fun p => eqBits (c.stk p) []) &&
+    eqBits (c.stk (10 : Fin 11)) [false, true] &&
+    comparisonState c.var (valid && decide (1 + n + n ^ 2 ≤ bits.length))
+
+#guard checkRelations 2 [true, false, true, true, false, false, true, false, true] true
+#guard checkRelations 2 [true, false, true] true
+#guard checkRelations 0 [true, false, true] true
+#guard checkRelations 0 [] true
+#guard checkRelations 1 [true, true, true] false
+
+def coordProgram : BitProgram (Fin 7) ((Unit × Bool) × Bool) :=
+  Lax979537Proofs.StackCoordinate.parse 0 1 2 3 4 5
+def coordMachine : FinTM2 := machine coordProgram 0 1 ((((), true), true), none)
+def coordState (s : ((Unit × Bool) × Bool) × Option Bool) (valid : Bool) : Bool :=
+  s == ((((), true), valid), none)
+
+def checkCoord (n : Nat) (bits : List Bool) (valid : Bool) : Bool :=
+  let s : BitStore (Fin 7) ((Unit × Bool) × Bool) := ⟨((((), false), valid), some true), fun p =>
+    if p = 0 then bits else if p = 2 then List.replicate n true else
+    if p = 6 then [true, false] else []⟩
+  let r := Lax979537Proofs.StackUnary.splitUnary bits
+  let c := runFuel coordMachine (15 * bits.length + 12 * n + 21)
+    (config (some (entry coordProgram)) s)
+  c.l.isNone && eqBits (c.stk (0 : Fin 7)) (r.2.getD []) &&
+    eqBits (c.stk (1 : Fin 7)) (List.replicate r.1 true) &&
+    eqBits (c.stk (2 : Fin 7)) (List.replicate n true) &&
+    ([3, 4, 5] : List (Fin 7)).all (fun p => eqBits (c.stk p) []) &&
+    eqBits (c.stk (6 : Fin 7)) [true, false] &&
+    coordState c.var (valid && r.2.isSome && decide (r.1 < n))
+
+#guard (List.range 4).all fun n => (List.range 5).all fun a =>
+  checkCoord n (List.replicate a true ++ [false, true, false]) true
+#guard checkCoord 5 [true, true] true
+#guard checkCoord 5 [false] false
+
+#print axioms Lax979537Proofs.StackTake.takeBits_store
+#print axioms Lax979537Proofs.StackReadTable.readTable_executes
+#print axioms Lax979537Proofs.StackReadRelations.readTables_executes
+#print axioms Lax979537Proofs.StackCheckedUnary.parse_executes
+#print axioms Lax979537Proofs.StackCheckBound.checkBound_executes
+#print axioms Lax979537Proofs.StackCoordinate.parse_executes
+
+def endProgram : BitProgram Bool (Unit × Bool) := Lax979537Proofs.StackCheckedUnary.checkEnd false
+def endMachine : FinTM2 := machine endProgram false true (((), true), none)
+
+#guard let c := runFuel endMachine 1 (initList endMachine []);
+  c.l.isNone && comparisonState c.var true
+#guard let c := runFuel endMachine 1 (initList endMachine [false]);
+  c.l.isNone && eqBits (c.stk false) [false] && comparisonState c.var false
+
+#print axioms Lax979537Proofs.StackCheckedUnary.checkEnd_executes
 
 end VardiImmermanStackTests

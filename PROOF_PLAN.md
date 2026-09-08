@@ -90,8 +90,15 @@ compares counter lengths, cleans both counters, and leaves a Boolean result;
 polynomial depending only on k and all temporary counters returned empty.
 These proofs cover arbitrary surrounding stack contents and auxiliary state.
 
-Next, implement bounded table-prefix extraction and the concrete input
-decoder, using the power routine for relation table lengths. Store domain/tuple coordinates as unary
+`StackTake`, `StackReadTable`, and `StackReadRelations` now parse every dense
+table using the power routine, with checked exhaustion and shared work stacks.
+`StackCheckedUnary`, `StackCheckBound`, and `StackCoordinate` handle checked
+unary parsing, preserving comparisons, pointed coordinates, and trailing
+input. Assemble these into a finite-layout decoder and prove its exact
+correspondence with the existing semantic decoder next. See `CURRENT_STATE.md`
+for the compatible control-state convention and port reuse.
+
+Store domain/tuple coordinates as unary
 counters on separate stacks, and relations as dense bit tables. This avoids
 word-size simulation work: even full table scans and unary arithmetic cost
 only polynomial overhead for fixed arities. Formula recursion chooses a fixed

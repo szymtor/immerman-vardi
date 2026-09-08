@@ -81,6 +81,14 @@ theorem transfer_executes [DecidableEq K] (base : K → List Bool) (src dst : K)
   have ht : 1 + (3 * xs.length + 1) = 3 * xs.length + 2 := by omega
   simpa only [ht] using h
 
+theorem transfer_store [DecidableEq K] (src dst : K) (hne : src ≠ dst)
+    (s : BitStore K Aux) :
+    Executes (transfer src dst) s
+      ⟨(s.state.1, none), Function.update (Function.update s.stk src []) dst
+        ((s.stk src).reverse ++ s.stk dst)⟩ (3 * (s.stk src).length + 2) := by
+  simpa only [working, Function.update_eq_self, Prod.mk.eta] using
+    transfer_executes s.stk src dst hne (s.stk src) (s.stk dst) s.state.1 s.state.2
+
 theorem working_input (xs : List Bool) :
     working (fun _ : Bool => []) false true xs [] () none =
       ioStore false ((), none) xs := by

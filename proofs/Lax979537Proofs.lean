@@ -25,3 +25,9 @@ import Lax979537Proofs.StackClear
 import Lax979537Proofs.StackCompare
 import Lax979537Proofs.StackLookup
 import Lax979537Proofs.StackPower
+import Lax979537Proofs.StackTake
+import Lax979537Proofs.StackReadTable
+import Lax979537Proofs.StackReadRelations
+import Lax979537Proofs.StackCheckedUnary
+import Lax979537Proofs.StackCheckBound
+import Lax979537Proofs.StackCoordinate

@@ -241,10 +241,65 @@ and Quot.sound; `splitUnary_correct` uses no axioms. Full Lax replay passed in
 All three new machine modules were included. The two main computational
 directions remain open; this successful replay does not close them.
 
-Implementation detail for the next copy routine: move `src` into an empty
-temporary stack using `transfer`; then pop that temporary stack while pushing
-each saved bit onto both `src` and `dst`. This restores `src`, prepends the
-same bit string to `dst`, and clears the temporary stack. A three-stack store
-invariant and pairwise-distinct indices suffice; all other stacks and the
-Aux part of finite control remain framed. Such a linear preserving copy then
-supports unary-bound loops and non-destructive table scans.
+## Decoder subroutines checkpoint
+
+Six further modules compile, all for actual structured stack programs:
+
+- `StackTake.takeBits_store` consumes a length counter and extracts a fixed
+  prefix in reverse order. Exhaustion pads false bits and sets a sticky
+  validity bit to false. `prefix_eq_take` identifies the result with an
+  ordinary prefix whenever sufficient input exists.
+- `StackReadTable.readTable_executes` composes the power counter, extraction,
+  and reversal. It parses one arity-k dense relation table in canonical bit
+  order, retains the input suffix, restores work counters, and has a fixed
+  polynomial bound. `result_table` and `result_preserves` expose its effects.
+- `StackReadRelations.readTables_executes` parses a whole fixed list of
+  relation tables, reusing a `Workspace` of private counters. `Fresh` separates
+  table stacks, and `Ready` tracks the domain counter and empty work stacks.
+  Its runtime is the sum of the individual fixed-arity polynomials.
+- `StackCheckedUnary.parse_executes` integrates delimiter checking with the
+  same sticky validity convention; its result matches `StackUnary.splitUnary`.
+  `checkEnd_executes` rejects trailing input without consuming it.
+- `StackCheckBound.checkBound_executes` copies both counters, compares their
+  lengths, accumulates validity, and restores all stacks. A spare control bit
+  saves prior validity across the comparison and is reset to true.
+- `StackCoordinate.parse_executes` parses and validates one pointed
+  coordinate. Its bound is linear in the current input and domain lengths;
+  `result_valid` is exactly delimiter success and coordinate < domain size,
+  conjoined with prior validity.
+
+Store-level interfaces were also added for transfer and comparison. The
+expanded compiled-machine tests pass for mixed arities [0,1,2], insufficient
+input, nullary relations on empty domains, sticky prior failure, coordinates
+inside/outside the domain, and missing delimiters. They check table order,
+retained suffixes, control reset, and preservation of unrelated stacks.
+All audited results use only standard Lean axioms.
+
+The full decoder is NOT yet assembled or related end-to-end to `Decoding.decode`.
+The evaluator and arbitrary TM2-to-formula simulation remain open.
+
+Next: choose a finite stack layout with five reserved ports, a pool of
+max-arity counters, relation-table ports, and pointed-coordinate ports. Fold
+`StackCoordinate.parse` over the coordinate ports, then sequence checked
+header parsing, `readTables`, the coordinate fold, and `checkEnd`. The two
+comparison copies can use Workspace.count and Workspace.rev, with Workspace.tmp
+as the copying temporary. They are empty between decoder phases.
+
+Use control `BitProgram K ((Unit × Bool) × Bool)`, initially
+`((((), true), true), none)`: the inner auxiliary Bool is the comparison spare,
+and the final Bool in auxiliary control is sticky validity. Relation parsing
+uses `Aux := Unit × Bool`; coordinate parsing uses `Aux := Unit`. Prove input
+suffix lengths never grow, bound parsed n by original input length, and lift
+the fixed-polynomial costs accordingly. The remaining semantic bridge must
+prove exact acceptance of canonical encodings, including malformed input.
+The existing `Decoding.decode`/`DecisionProcedure.checkedDecode` specifications
+are available; do not assume that bridge or treat these subroutine tests as
+the complete machine proof.
+
+Checkpoint validation: the expanded `tests/StackMachine.lean` passes,
+including the final trailing-input tests. `checkEnd_executes` uses only
+Quot.sound; the other new audited results use at most the standard three
+Lean axioms. Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color`
+passed in 5m13s (kernel replay 4m45s), with eight concepts and seven annotated
+proofs. The concepts are unchanged from cf16245. The two main directions
+remain open, and nothing has been submitted or published.
