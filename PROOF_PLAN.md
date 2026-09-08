@@ -98,12 +98,13 @@ input. Assemble these into a finite-layout decoder and prove its exact
 correspondence with the existing semantic decoder next. See `CURRENT_STATE.md`
 for the compatible control-state convention and port reuse.
 
-The full finite decoder is now assembled in `StackDecoder` and `FiniteDecoder`,
-with an actual TM2 execution theorem bounded by a polynomial in original input
-length. `DecoderSoundness` proves that semantic decoding already enforces
-canonical encodings, so no extra serialization pass is needed. The next
-obligation is GENERAL correspondence between the concrete decoder's result
-and `Decoding.decode`; compiled-machine tests currently verify examples only.
+The full finite decoder is now proved correct in `DecoderCorrectness`.
+`decoder_correct` combines a polynomial actual-TM2 execution bound, exact
+canonical-input recognition, and the `Represents` contract for retained data.
+`DecoderSoundness` removes the redundant serialization pass, and
+`RawDecoding`/`DecoderAgreement` establish general machine/semantic-parser
+correspondence. These are proofs for every input, not only executable tests.
+Continue with the generalized formula evaluator and its concrete machine bound.
 
 Store domain/tuple coordinates as unary
 counters on separate stacks, and relations as dense bit tables. This avoids
@@ -115,3 +116,16 @@ stages. Each stage stores its full new table before advancing. Prove program
 invariants and correctness, then transfer coarse polynomial bounds through
 `program_polytime`. The full evaluator is still not implemented in this
 language.
+
+For the reverse direction, assess a direct persistent-stack encoding before
+adding a full single-tape simulator. A TM2 configuration can be represented
+by time, finite control/label, and one node pointer per stack. Initial input
+nodes have FO-defined symbols and successor pointers; each push creates a
+node indexed by time and a fixed instruction position, recording its symbol
+and previous head. Pop/peek consult these positive node facts. A positive
+rule system can then encode intermediate instruction states and successive
+configurations. This is an implementation candidate, not a proved bridge;
+it still requires finite reachable alphabet support, bounded node addresses,
+input interpretation, macro-step refinement, and soundness/completeness of
+the closure. It may avoid forcing TM2 into the existing local-cell tableau
+helper, whose fixed neighborhood does not directly describe linked stacks.

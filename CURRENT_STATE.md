@@ -367,3 +367,67 @@ concrete `decoder_runs` axiom audit. Full
 (kernel replay 5m25s): eight concepts and seven annotated proofs. All four
 new modules were included. The approved concepts remain unchanged, both
 main concept obligations remain open, and no submission was made.
+
+## Decoder correctness completed
+
+The general decoder correspondence is now proved, not merely tested:
+
+- `RawDecoding.Data` is a proof-side observation of size, dense bit tables,
+  and coordinate values. `decode_eq` identifies its parser exactly with
+  `Decoding.decode.map RawDecoding.view`. It does not change acceptance.
+- `DecoderAgreement.tables_agree` and `coords_agree` prove agreement of the
+  machine's sticky validity bit and all retained payloads with those parser
+  phases. `decode_agree` composes them for any well-formed fixed layout.
+- `finite_agree` specializes to the actual finite decoder for arbitrary σ,k.
+  `accepts_iff_encoding` proves exact recognition of canonical pointed
+  structure encodings. `finite_data` proves correct domain, tables, and
+  coordinate values on every successful semantic decode.
+- `DecoderCorrectness.Represents A s` is the evaluator's input contract:
+  a unary domain counter, empty reusable work stacks, empty input stack,
+  exact canonical relation-bit tables, and coordinate-counter lengths equal
+  to the pointed coordinates. `result_represents` proves this contract.
+- `decoder_correct` combines bounded actual TM2 execution from `initList`,
+  exact acceptance, and `Represents` for every encoded input. This closes
+  the complete decoder bridge. The machine also terminates and rejects
+  every malformed input within its fixed polynomial bound.
+
+`tests/DecoderMachine.lean` passes with the new proofs imported. All audited
+new results use only propext, Classical.choice, and Quot.sound. The three new
+modules are imported by the proof root. No concept was changed.
+
+Next major forward-direction step: the formula evaluator over this retained
+representation. Compile a generalized admissible `RawFormula σ m ρ` with
+element-counter ports and bound-relation-table ports. The program must be
+fixed by the syntax/layout, independently of the input size and structure.
+Preserve input tables and environment counters, use fresh local slots for
+bound variables/LFP tables, and return the Boolean result with local workspace
+cleaned. `TableEvaluation.evaluate_correct` is the semantic specification;
+the old `EvaluationWork` charge remains only an algorithmic bound until
+connected to actual compiled executions.
+
+A practical next primitive is tuple iteration with one copied domain counter
+and a fresh increasing unary coordinate at each fixed nesting level. It
+should execute a callback for tuples in `StructureEncoding.tuples` order,
+preserve domain/environment stacks, and clean all private counters afterward.
+Full scans suffice for atomic table lookup; no rank arithmetic or sharp
+runtime exponent is required. The same iterator serves quantifiers and
+materialized LFP stages. A fixed formula determines a finite collection of
+private slots. Keep the complete evaluator and reverse simulation as the
+remaining main obligations; decoder completion is not theorem completion.
+
+The standalone `FiniteDecoder.Port σ k` has no evaluator-specific private
+ports. Extend it by a finite sum when assembling the evaluator. A stack-port
+renaming theorem for `StackProgram.Program` along an injection can reuse the
+decoder execution and representation proof while framing the extra ports;
+alternatively instantiate the already-generic `StackDecoder.Layout` over the
+extended type. The control state can remain the existing finite Boolean
+registers, with saved intermediate values on private bit stacks. Do not make
+the compiled program depend on n, the structure, or its runtime contents.
+
+Checkpoint validation: `tests/DecoderMachine.lean` passes with all general
+agreement/correctness axioms audited. Full
+`env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in 6m16s
+(kernel replay 5m48s), including all three new modules. Lax reports eight
+concepts and seven annotated proofs. The decoder obligation is complete,
+but the two main computational directions remain open and the final theorem
+is still conditional on them. No concepts changed and nothing was submitted.

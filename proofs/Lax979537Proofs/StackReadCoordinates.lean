@@ -108,4 +108,12 @@ theorem input_length_le (w : Workspace K) (coords : List K)
       exact (ih (fun d hm => hf d (by simp [hm])) _).trans
         (coordinate_input_le w c (hf c (by simp)) s)
 
+theorem coords_ready (w : Workspace K) (coords : List K) (hf : ∀ c ∈ coords, Fresh w c)
+    (n : Nat) (s : BitStore K ((Aux × Bool) × Bool)) (hs : Ready w n s) :
+    Ready w n (result w coords s) := by
+  induction coords generalizing s with
+  | nil => exact hs
+  | cons c cs ih =>
+      exact ih (fun d hm => hf d (by simp [hm])) _ (coordinate_ready w c (hf c (by simp)) n s hs)
+
 end Lax979537Proofs.StackReadCoordinates

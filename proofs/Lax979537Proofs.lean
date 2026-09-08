@@ -35,3 +35,6 @@ import Lax979537Proofs.StackReadCoordinates
 import Lax979537Proofs.StackDecoder
 import Lax979537Proofs.FiniteDecoder
 import Lax979537Proofs.DecoderSoundness
+import Lax979537Proofs.RawDecoding
+import Lax979537Proofs.DecoderAgreement
+import Lax979537Proofs.DecoderCorrectness

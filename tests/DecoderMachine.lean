@@ -1,5 +1,4 @@
-import Lax979537Proofs.FiniteDecoder
-import Lax979537Proofs.DecoderSoundness
+import Lax979537Proofs.DecoderCorrectness
 
 namespace VardiImmermanDecoderTests
 
@@ -61,5 +60,13 @@ def words : Nat → List (List Bool)
 #print axioms FiniteDecoder.decoder_runs
 #print axioms DecoderSoundness.decode_sound
 #print axioms DecoderSoundness.checkedDecode_eq_decode
+#print axioms RawDecoding.decode_eq
+#print axioms DecoderAgreement.tables_agree
+#print axioms DecoderAgreement.coords_agree
+#print axioms DecoderAgreement.decode_agree
+#print axioms DecoderAgreement.finite_agree
+#print axioms DecoderAgreement.accepts_iff_encoding
+#print axioms DecoderCorrectness.result_represents
+#print axioms DecoderCorrectness.decoder_correct
 
 end VardiImmermanDecoderTests

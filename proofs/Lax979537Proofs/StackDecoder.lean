@@ -113,4 +113,10 @@ theorem decode_executes (l : Layout K) (s : BitStore K ((Aux × Bool) × Bool))
     Polynomial.eval_X]
   omega
 
+theorem result_ready (l : Layout K) (s : BitStore K ((Aux × Bool) × Bool))
+    (hs : ∀ key, key ≠ l.work.input → s.stk key = []) :
+    Ready l.work (StackUnary.splitUnary (s.stk l.work.input)).1 (result l s) := by
+  exact StackReadCoordinates.coords_ready l.work l.coords l.coord_fresh _ _
+    (StackReadRelations.tables_ready l.work _ l.tables l.table_fresh _ (header_ready l.work s hs))
+
 end Lax979537Proofs.StackDecoder
