@@ -202,3 +202,15 @@ mix different prefixes is part of the simulation invariant. Node keys can
 distinguish initial nodes from push nodes, whose remaining key is the time
 tuple and a fixed instruction-position tag. None of these choices changes
 the approved theorem or the finite-TM2 model.
+
+The preliminary normalization for this reverse construction is now proved.
+`TM2Alphabet` supplies a finite set containing all reachable tagged symbols,
+without assuming finite internal alphabet types. `TM2Micro` replaces each
+macro-step by individual operations, proves refinement of `TM2.stepAux` and
+bounded actual runs, and gives a fixed multiplicative overhead. Halting is
+absorbing, so the exact time horizon can be any larger polynomial bound.
+`TM2MicroSupport` proves finite control/symbol support and the stack-length
+bound at every intermediate step. Each microstep makes at most one push;
+created persistent nodes can therefore use the microstep time alone as their
+unique key. Positive-rule simulation, input interpretation, tuple coding,
+and the reverse theorem itself remain to be implemented.

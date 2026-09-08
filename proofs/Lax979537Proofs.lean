@@ -70,3 +70,6 @@ import Lax979537Proofs.DecoderUnary
 import Lax979537Proofs.FormulaPorts
 import Lax979537Proofs.FormulaDecision
 import Lax979537Proofs.FixedPointEvaluation
+import Lax979537Proofs.TM2Alphabet
+import Lax979537Proofs.TM2Micro
+import Lax979537Proofs.TM2MicroSupport

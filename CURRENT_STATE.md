@@ -871,3 +871,64 @@ equivalence's audit reports exactly one additional axiom: `ptimeDefinable`.
 Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in
 9m13s (kernel replay 8m48s): eight concepts and eight annotated proofs.
 Concepts remain identical to cf16245. Nothing was submitted.
+
+## Finite alphabets and operation-by-operation TM2 simulation
+
+The first reverse-direction normalization is now implemented:
+
+- `TM2Alphabet.symbols` collects all possible push symbols from a statement
+  over its finite control state. `alphabet tm` adds these across all labels
+  and includes the input alphabet. Its membership invariant is proved through
+  every statement operation, macro-step, and bounded actual TM2 run. No
+  finiteness assumption is added for internal alphabet types. `Symbol tm`
+  is a finite type of tagged reachable symbols.
+- `TM2Micro.next` splits each TM2 statement into individual push, pop, peek,
+  load, branch, goto, and halt operations, with explicit label boundaries.
+  `statement_refines` proves agreement with the actual `TM2.stepAux`.
+  `evals_refines` lifts an `EvalsToInTime` witness to the new simulation with
+  a fixed multiplicative time overhead `factor tm`. The factor is a coarse
+  sum of statement weights plus one; no optimized bound is needed.
+- `TM2Micro.evals_at_time` gives the same terminal configuration at every
+  time beyond that bound, using an absorbing halt boundary. This is suitable
+  for a tuple-sized time horizon in the eventual fixed-point formula.
+- `TM2MicroSupport.controls` is a finite set of boundary labels and
+  substatement cursors. `initial_run_support` proves that every intermediate
+  control and stack symbol stays in the corresponding finite support sets.
+  `initial_length` bounds each stack by input length plus the number of
+  individual operations, so stack-address space is also polynomial.
+
+These normalize arbitrary finite TM2 machines without weakening the approved
+complexity definition. They do not yet construct the reverse FO(LFP) formula.
+The next task is to encode the normalized computation by positive relational
+rules, prove their soundness/completeness, and interpret the chosen input
+encoding and finite tags by actual formulas. The existing persistent-node
+candidate avoids first-order arithmetic for flat input bit offsets: initial
+nodes are tagged by encoding block and local tuple/element address, and each
+push node is tagged by its unique microstep time. The new microstep model
+makes at most one push per time, so no within-statement position tag is needed
+for created nodes. Pop/peek use positive node facts; all pointed runs can be
+kept separate by prefixing facts with the query tuple. This remains a planned
+construction, not an assumed simulation correspondence.
+
+A suitable next bounded implementation is a persistent-stack representation
+lemma independent of formula syntax: represent a stack by an optional node
+head and a finite chain of immutable `(node, symbol, parent)` records. Under
+functional node records, prove uniqueness of the represented list and exact
+push/pop/peek behavior; adding a fresh node preserves all existing chains.
+Then lift this representation to `TM2Micro.next`, using one fresh created
+node keyed by the current microstep for a push and preserving old records.
+Initial chains can first use a list of abstract node identifiers in input
+order; the subsequent FO input interpretation will supply their concrete
+block/tuple encoding. Do not require a flat arithmetic bit-address formula
+or silently assume a rule-to-machine correspondence.
+
+Validation: `tests/TM2Micro.lean` passes a concrete two-stack TM2 with Bool
+input and an infinite Nat internal alphabet, using push, pop, peek, load,
+branch, goto, and halt. It checks intermediate symbols, final stack contents,
+different termination times for the two branches, and stability after halt.
+Symbolic examples instantiate the general support and refinement theorems.
+All five audited theorem sets contain only standard Lean axioms. Full
+`env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in 11m18s
+(kernel replay 11m07s): eight concepts and eight annotated proofs. The
+approved concepts remain identical to cf16245. The forward theorem is proved;
+the reverse theorem and final submission remain pending.
