@@ -932,3 +932,87 @@ All five audited theorem sets contain only standard Lean axioms. Full
 (kernel replay 11m07s): eight concepts and eight annotated proofs. The
 approved concepts remain identical to cf16245. The forward theorem is proved;
 the reverse theorem and final submission remain pending.
+
+## Persistent-node simulation and exact positive closure
+
+The planned linked-stack simulation is now implemented and connected to
+arbitrary actual TM2 runs:
+
+- `PersistentStack` represents a list by a finite chain of immutable
+  `(node, symbol, parent)` records. Functional records imply a unique list
+  at each head; different heads may share a suffix. Fresh insertion preserves
+  functionality and all old chains. `Read` uses an explicit empty head or
+  one positive node fact, with proved lookup correctness and uniqueness.
+- `NodeMachine.Step` implements every `TM2Micro.next` operation using heads
+  and tagged symbol records. `step_sound` preserves representation and
+  functionality when a newly allocated node is fresh, and `step_exists`
+  proves totality on represented stacks. Steps are deterministic under a
+  functional heap and monotone when more node facts are available.
+- `TimedNodes.Run` allocates push nodes as `Sum.inr time`, separating them
+  from `Sum.inl initialIdentifier`. The timestamp invariant proves freshness
+  for each step. `run_sound`, `run_exists`, and `run_unique` give exact
+  agreement with the normalized TM2 at every time.
+- `NodeInput` explicitly builds initial node records from the input list
+  and any injective identifier map `Fin input.length → Initial`. It proves
+  the initial chain, functionality, timestamp bound, and exact representation
+  of `Turing.initList`. Thus these initial invariants are discharged, not
+  assumptions of the reverse computational theorem.
+- `NodeTrace` chooses a proof-side canonical run, proves its adjacent steps,
+  and proves monotonicity of its heap. Its `Context` stores only the initial
+  representation data; `NodeTrace.input` supplies this context for actual
+  TM2 inputs using the preceding theorems.
+- `NodeClosure.operator` is a concrete monotone operator on configuration
+  and node facts. Initial nodes/configuration seed the relation; configuration
+  facts produce push records and next configurations using positive reads.
+  `closure_eq_trace` proves that its least fixed point is EXACTLY the bounded
+  run's configurations and final heap, with no spurious facts. Soundness uses
+  the final functional heap and deterministic steps; completeness lifts each
+  actual step through the growing node facts.
+- `NodeAcceptance.accepts_iff` connects this positive closure to the actual
+  output symbol of any bounded TM2 computation. Any horizon at least
+  `TM2Micro.factor tm * timeBound` is sufficient because halt is absorbing.
+
+This completes the semantic positive-rule simulation. It does not yet prove
+`ptimeDefinable`: the concrete rule operator still must be represented by
+actual FO(LFP) syntax over the input structure. Remaining work includes the
+FO interpretation of initial identifiers and symbols for the chosen dense
+encoding, finite tag and tuple coding, query-parameter separation, and the
+coarse polynomial time/address horizon with small-domain patching.
+
+The next syntax bridge must expand the finite cases of `NodeMachine.Step`
+into actual `PositiveRules.Rule` values. In `NodeClosure.operator`, the
+existential result heap of a step is merely a convenient semantic projection;
+it is NOT a first-order quantifier. Eliminate it by the explicit Step cases:
+push/load/branch/goto/halt have fixed head/control updates, and pop/peek use
+one `Read` fact with a typed finite symbol choice. No negative node-freshness
+test is needed in the logical rules; freshness is already proved by time.
+Use the proved finite support sets from `TM2MicroSupport`/`TM2Alphabet`, and
+instantiate initial identifiers by block/local tuple coordinates. The raw
+semantic Fact type is unrestricted, so any finite tuple presentation must
+prove its support/coding correspondence, not assume global expressibility.
+
+Concrete next input-interpretation option: split the approved encoding into
+a fixed list of segments. The header is a unary-ones segment followed by a
+nullary false delimiter; each input relation is a full canonical tuple-table
+segment; each pointed coordinate is a unary-ones segment restricted by
+`i < a_j`, followed by its nullary false delimiter. Give every segment its
+own finite tag and pad local tuple addresses by zero to one fixed width.
+For n above the fixed tag threshold, these are actual tuples in Fin n.
+This makes symbol and valid-position predicates first-order. Within-segment
+successors use ordinary/lexicographic successor; across segments, a fixed
+finite disjunction requires the previous last position, the next first
+position, and emptiness of every intervening segment. Only pointed unary
+segments can be empty for n ≥ 2. Prove the concatenated segment enumeration
+is duplicate-free and its bit list equals `StructureEncoding.encode A`;
+its position map then instantiates the injective `ids` parameter already
+used by NodeInput/NodeAcceptance. Small domains remain covered by the proved
+finite-exception construction. This is a next implementation plan, not a
+proved input interpretation yet.
+
+Validation: `tests/NodeSimulation.lean` passed the persistent-stack sharing,
+positive-read, and actual constant-output TM2 examples, including symbolic
+acceptance at every sufficient horizon. Axiom audits contain only standard
+Lean axioms. Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color`
+passed in 10m39s (kernel replay 10m22s), with eight concepts and eight
+annotated proofs. Concepts remain unchanged from cf16245. The reverse
+definability theorem and final submission are still pending.

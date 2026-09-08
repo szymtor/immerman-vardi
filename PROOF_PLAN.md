@@ -214,3 +214,15 @@ bound at every intermediate step. Each microstep makes at most one push;
 created persistent nodes can therefore use the microstep time alone as their
 unique key. Positive-rule simulation, input interpretation, tuple coding,
 and the reverse theorem itself remain to be implemented.
+
+The persistent-node semantics and its positive closure are now proved in
+`PersistentStack`, `NodeMachine`, `TimedNodes`, `NodeInput`, `NodeTrace`,
+`NodeClosure`, and `NodeAcceptance`. The initial list has an explicit node
+representation, time names make each push fresh, and the positive least
+fixed point contains exactly the actual bounded computation. Its acceptance
+predicate agrees with the output of the original TM2. The remaining reverse
+obligation is the concrete FO(LFP) presentation: interpret initial input
+nodes, encode finite controls/symbols and bounded node/time addresses, compile
+the explicit transition cases to positive rules, separate pointed parameters,
+and patch small domains. See the latest `CURRENT_STATE.md` section; no
+expressibility or rule-to-machine correspondence is assumed.

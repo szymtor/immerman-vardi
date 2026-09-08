@@ -73,3 +73,10 @@ import Lax979537Proofs.FixedPointEvaluation
 import Lax979537Proofs.TM2Alphabet
 import Lax979537Proofs.TM2Micro
 import Lax979537Proofs.TM2MicroSupport
+import Lax979537Proofs.PersistentStack
+import Lax979537Proofs.NodeMachine
+import Lax979537Proofs.TimedNodes
+import Lax979537Proofs.NodeInput
+import Lax979537Proofs.NodeTrace
+import Lax979537Proofs.NodeClosure
+import Lax979537Proofs.NodeAcceptance
