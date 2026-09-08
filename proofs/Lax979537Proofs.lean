@@ -65,3 +65,8 @@ import Lax979537Proofs.FormulaRepresentation
 import Lax979537Proofs.FormulaCorrectness
 import Lax979537Proofs.LfpWorkspace
 import Lax979537Proofs.FormulaLfpCorrectness
+import Lax979537Proofs.StackOutput
+import Lax979537Proofs.DecoderUnary
+import Lax979537Proofs.FormulaPorts
+import Lax979537Proofs.FormulaDecision
+import Lax979537Proofs.FixedPointEvaluation

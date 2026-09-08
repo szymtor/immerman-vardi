@@ -161,12 +161,11 @@ That compiler is now complete: `FormulaProgram.compile_correct` proves
 bounded actual execution for every raw formula, using a finite workspace
 determined by syntax and the represented structure/variable/relation
 environment. It covers arbitrary nesting and restores every stack. The
-remaining forward work is composition with the concrete decoder, checking
-its retained unary coordinate words, then clearing the fixed set of ports
-and producing the singleton Boolean output with reset control. The latest
-`CURRENT_STATE.md` section gives the concrete interfaces and a coarse cleanup
-bound. The two main concept axioms remain open pending that assembly and the
-reverse simulation below.
+forward assembly is now complete in `FormulaDecision`: exact decoding,
+evaluation or rejection, clearing the fixed set of ports, singleton Boolean
+output, and reset control, all within a polynomial in input bit length.
+`FixedPointEvaluation.evaluationInP` is proved without additional assumptions.
+The final equivalence now depends only on the reverse simulation below.
 
 For the reverse direction, assess a direct persistent-stack encoding before
 adding a full single-tape simulator. A TM2 configuration can be represented

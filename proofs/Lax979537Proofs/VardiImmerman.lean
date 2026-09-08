@@ -1,4 +1,5 @@
 import Lax979537.VardiImmerman
+import Lax979537Proofs.FixedPointEvaluation
 
 namespace Lax979537Proofs.VardiImmerman
 
@@ -9,7 +10,7 @@ open Lax979537.PolynomialTime
 theorem definable_inP {σ : Vocabulary} {k : Nat} (Q : Query σ k)
     (hQ : Definable Q) : InP Q := by
   obtain ⟨φ, hφ⟩ := hQ
-  obtain ⟨f, hf, hdec⟩ := Lax979537.FixedPointEvaluation.evaluationInP φ
+  obtain ⟨f, hf, hdec⟩ := Lax979537Proofs.FixedPointEvaluation.evaluationInP φ
   refine ⟨f, hf, fun w => (hdec w).trans ?_⟩
   exact exists_congr fun A => and_congr Iff.rfl (hφ A).symm
 
@@ -17,11 +18,10 @@ theorem definable_inP {σ : Vocabulary} {k : Nat} (Q : Query σ k)
 ---
 conclusion: Lax979537.VardiImmerman.capturesPtime
 assumptions:
-  - Lax979537.FixedPointEvaluation.evaluationInP
   - Lax979537.VardiImmerman.ptimeDefinable
 ---
-Logical assembly of the two directions. The theorem remains conditional in
-the Lax proof network until both computational directions are discharged.
+The forward direction uses the proved concrete evaluator. The theorem
+remains conditional on the reverse machine-to-formula simulation.
 -/
 theorem capturesPtime {σ : Vocabulary} {k : Nat} (Q : Query σ k) :
     Definable Q ↔ InP Q :=

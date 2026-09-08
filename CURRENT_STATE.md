@@ -5,7 +5,7 @@ Updated: 2026-09-08.
 The user approved the eight concept files and authorized proof implementation
 and completion of the submission. The concepts are frozen and unchanged from
 commit cf16245. No further permission is needed for proof work. The task is
-not complete: both main computational directions remain open.
+not complete: the reverse machine-to-formula direction remains open.
 
 The user has now explicitly made completion and submission our active goal.
 They also emphasized that any polynomial runtime bound is sufficient; do not
@@ -21,7 +21,7 @@ criteria are fidelity to the original formulation and clarity of concepts.
 
 ## Proved
 
-Six concept statements have proofs with no outstanding Lax assumptions:
+Seven concept statements have proofs with no outstanding Lax assumptions:
 
 - LeastFixedPoints.fixedPoint
 - LeastFixedPoints.least
@@ -29,9 +29,10 @@ Six concept statements have proofs with no outstanding Lax assumptions:
 - FixedPointSemantics.positiveBodyMonotone
 - StructureEncoding.encodeInjective
 - StructureEncoding.encodeLength
+- FixedPointEvaluation.evaluationInP
 
 `VardiImmerman.capturesPtime` has an annotated proof relative to precisely
-`FixedPointEvaluation.evaluationInP` and `VardiImmerman.ptimeDefinable`.
+`VardiImmerman.ptimeDefinable`; its forward direction uses the proved evaluator.
 This conditional assembly must not be described as a complete proof.
 
 Further proved implementation results, all in the proof package:
@@ -76,14 +77,12 @@ Further proved implementation results, all in the proof package:
 
 ## Remaining main proof obligations
 
-1. `FixedPointEvaluation.evaluationInP`: supply an actual bundled finite TM2
-   machine and polynomial step bound for the verified decision procedure.
-   Correct executable Lean code is not itself a proof of this machine claim.
-   A sufficient target is
-   `Nonempty (Turing.TM2ComputableInPolyTime id (fun b => [b])
-     (DecisionProcedure.decideFormula φ))` for every fixed formula φ.
-   The correctness half is already `decideFormula_correct`.
-2. `VardiImmerman.ptimeDefinable`: construct a positive fixed-point formula
+`FixedPointEvaluation.evaluationInP` is now proved by the actual bundled
+finite TM2 and polynomial execution bound in `FormulaDecision`. Its complete
+input/output convention and malformed-input rejection are proved for every
+bit string. The remaining main obligation is:
+
+1. `VardiImmerman.ptimeDefinable`: construct a positive fixed-point formula
    for an arbitrary polynomial-time finite TM2 computation. Renaming and
    tuple ordering, numerical address formulas, a generic positive tableau
    invariant, and a positive-rule syntax compiler are available. The remaining
@@ -127,10 +126,10 @@ was added speculatively, and no imported `proof_wanted` assertion was used.
 
 Provisional id: lax-979537. No remote is configured, authors remain unfilled,
 and nothing has been submitted or published. Do not publish this as a completed
-Vardi–Immerman formalization while the two computational directions are open.
+Vardi–Immerman formalization while the reverse computational direction is open.
 The preview uses http://localhost:8125/lax-979537/index.html when running.
 
-Continue with the two main obligations above. Do not change the approved
+Continue with the reverse simulation above. Do not change the approved
 concepts, introduce sorry or new proof axioms, or use circular assumptions.
 
 ## Current iteration checks
@@ -808,3 +807,67 @@ Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in
 9m35s (kernel replay 9m06s), including all seven new modules. Concepts remain
 identical to cf16245. Lax reports eight concepts and seven annotated proofs;
 the two main computational axioms remain open. Nothing was submitted.
+
+## Forward computational theorem completed
+
+The decoder/evaluator/output assembly is now proved, superseding the
+remaining-forward-work plans above:
+
+- `DecoderUnary.finite_coord` proves the exact retained unary coordinate
+  words, completing the decoder-to-evaluator representation interface.
+- `StackOutput.length_executes` bounds each stack's length by its original
+  length plus execution cost, for arbitrary structured programs and alphabets.
+  `clearPorts_executes` clears a fixed list at a coarse linear bound in the
+  common maximum stack length; `output_executes` retains the answer, clears
+  every port, emits its singleton Boolean, and resets the control state.
+- `FormulaPorts` explicitly enumerates decoder and recursively allocated
+  formula ports, keeping the entire decision machine executable without a
+  noncomputable choice of finite enumeration.
+- `FormulaDecision.evaluate_executes` uses the decoder's validity bit to
+  select the proved evaluator or false, and its result is exactly the existing
+  total `DecisionProcedure.decideFormula` on every bit string.
+- `FormulaDecision.program_executes` composes decoder, evaluator, and output
+  into the exact input/output stack convention required by mathlib, with a
+  polynomial bound in input bit length including all malformed inputs.
+  `computableInPolyTime` supplies the actual bundled finite TM2 witness.
+- `FixedPointEvaluation.evaluationInP` now has an unconditional annotated
+  proof. `VardiImmerman.definable_inP` uses it, and the final equivalence's
+  only remaining Lax assumption is `VardiImmerman.ptimeDefinable`.
+
+The approved concepts are unchanged. The reverse arbitrary polynomial-time
+TM2-to-FO(LFP) construction and final submission remain unfinished.
+
+The next concrete reverse-direction subtask is finite reachable alphabet
+support for an arbitrary `Turing.FinTM2`. Its definition only assumes
+`Fintype (Γ k₀)` on the input alphabet; do not silently assume all Γ k finite.
+All control states and labels are finite. For each statement q, recursively
+collect a finite set of tagged symbols `(k, a) : Sigma Γ`: a push contributes
+the image of its finite control-state type under `v ↦ (k, f v)`, ordinary
+continuations recurse, branches take a union, and goto/halt contribute empty.
+Unite these sets over all machine labels and add every input-alphabet symbol.
+Prove by induction on `TM2.stepAux` that every stack symbol stays in this
+set, and hence through `TM2.step` and bounded runs. This gives the finite
+symbol codes needed by either persistent-node or bounded-cell simulation.
+
+The inspected primary implementation is mathlib's
+`Computability/TuringMachine/StackTuringMachine.lean`. `TM2.stepAux` executes
+an entire finite statement tree in one machine step; pop/peek can change
+control before the continuation. Its existing `stmts₁`/`stmts` collect finite
+substatement sets, and `stmts₁_trans` supplies closure under substatements.
+These can support finite micro-instruction labels. Existing `SupportsStmt`
+tracks goto labels only; it does not prove finite reachable alphabets.
+Any microstep simulation must prove its refinement and bound by a fixed
+multiple of machine steps. The reverse simulation is not yet implemented.
+
+Forward-checkpoint validation: `tests/DecisionMachine.lean` passes actual
+complete machines starting from mathlib's `initList`, including directed
+reachability in both directions and on the diagonal, empty-domain truth and
+existential quantification, nullary relation/LFP queries, truncated and
+trailing encodings, and all Boolean words of lengths 0–5 for two signatures.
+Each run checks halting, exactly one output bit, every other stack empty,
+and the full finite control reset. The forward theorem, its bundled machine
+witness, and `definable_inP` use only standard Lean axioms. The final
+equivalence's audit reports exactly one additional axiom: `ptimeDefinable`.
+Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in
+9m13s (kernel replay 8m48s): eight concepts and eight annotated proofs.
+Concepts remain identical to cf16245. Nothing was submitted.
