@@ -1,8 +1,8 @@
 import Lax979537Proofs.FixedPointEvaluation
-import Lax979537Proofs.VardiImmerman
+import Lax979537Proofs.ImmermanVardi
 import Mathlib.Data.Fin.VecNotation
 
-namespace VardiImmermanDecisionMachineTests
+namespace ImmermanVardiDecisionMachineTests
 
 open Lax979537.OrderedStructures Lax979537.FixedPointSyntax Lax979537.StructureEncoding
 open Lax979537Proofs Lax979537Proofs.StackProgram FormulaDecision Turing
@@ -70,7 +70,7 @@ example {σ : Vocabulary} {m : Nat} (φ : Formula σ m) :
 
 #print axioms Lax979537Proofs.FormulaDecision.computableInPolyTime
 #print axioms Lax979537Proofs.FixedPointEvaluation.evaluationInP
-#print axioms Lax979537Proofs.VardiImmerman.definable_inP
-#print axioms Lax979537Proofs.VardiImmerman.capturesPtime
+#print axioms Lax979537Proofs.ImmermanVardi.definable_inP
+#print axioms Lax979537Proofs.ImmermanVardi.capturesPtime
 
-end VardiImmermanDecisionMachineTests
+end ImmermanVardiDecisionMachineTests

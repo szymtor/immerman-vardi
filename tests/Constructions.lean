@@ -5,7 +5,7 @@ import Lax979537Proofs.EvaluationWork
 import Lax979537Proofs.DecisionProcedure
 import Mathlib.Data.Fin.VecNotation
 
-namespace VardiImmermanConstructionTests
+namespace ImmermanVardiConstructionTests
 
 open Lax979537.OrderedStructures Lax979537.FixedPointSyntax
 open Lax979537Proofs
@@ -95,4 +95,4 @@ example (t : Fin 10) (b : Bool) :
 #print axioms FiniteExceptions.bounded_definable
 #print axioms FiniteExceptions.definable_of_above
 
-end VardiImmermanConstructionTests
+end ImmermanVardiConstructionTests

@@ -1,6 +1,6 @@
 import Lax979537Proofs.DecoderCorrectness
 
-namespace VardiImmermanDecoderTests
+namespace ImmermanVardiDecoderTests
 
 open Lax979537.OrderedStructures Lax979537.StructureEncoding
 open Lax979537Proofs FiniteDecoder Turing
@@ -69,4 +69,4 @@ def words : Nat → List (List Bool)
 #print axioms DecoderCorrectness.result_represents
 #print axioms DecoderCorrectness.decoder_correct
 
-end VardiImmermanDecoderTests
+end ImmermanVardiDecoderTests

@@ -1,7 +1,7 @@
 import Lax979537Proofs.TM2MicroSupport
 import Mathlib.Data.Fin.VecNotation
 
-namespace VardiImmermanTM2MicroTests
+namespace ImmermanVardiTM2MicroTests
 
 open Turing Lax979537Proofs TM2Micro
 
@@ -75,4 +75,4 @@ example (xs : List (tm.Γ tm.k₀)) {d : tm.Cfg} {T N : Nat}
 #print axioms Lax979537Proofs.TM2MicroSupport.initial_run_support
 #print axioms Lax979537Proofs.TM2MicroSupport.initial_length
 
-end VardiImmermanTM2MicroTests
+end ImmermanVardiTM2MicroTests

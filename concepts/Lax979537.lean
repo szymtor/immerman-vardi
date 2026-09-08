@@ -5,4 +5,4 @@ import Lax979537.FixedPointSemantics
 import Lax979537.StructureEncoding
 import Lax979537.PolynomialTime
 import Lax979537.FixedPointEvaluation
-import Lax979537.VardiImmerman
+import Lax979537.ImmermanVardi

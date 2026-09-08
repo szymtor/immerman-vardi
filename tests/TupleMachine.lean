@@ -2,7 +2,7 @@ import Lax979537Proofs.StackMaterialize
 import Lax979537Proofs.StackAtomic
 import Lax979537Proofs.StackTableRound
 
-namespace VardiImmermanTupleMachineTests
+namespace ImmermanVardiTupleMachineTests
 
 open Lax979537Proofs Lax979537Proofs.StackProgram Lax979537Proofs.StackTransfer
 open StackBoolean StackTuples Turing
@@ -152,4 +152,4 @@ def roundLessMachine : FinTM2 := machine roundLessProgram 0 13 ((((), true), fal
 #print axioms StackMaterialize.eval_costPolynomial
 #print axioms StackTableRound.round_executes
 
-end VardiImmermanTupleMachineTests
+end ImmermanVardiTupleMachineTests

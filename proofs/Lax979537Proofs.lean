@@ -3,7 +3,7 @@ import Lax979537Proofs.Positivity
 import Lax979537Proofs.StructureEncoding
 import Lax979537Proofs.TableEvaluation
 import Lax979537Proofs.Decoding
-import Lax979537Proofs.VardiImmerman
+import Lax979537Proofs.ImmermanVardi
 import Lax979537Proofs.DecisionProcedure
 import Lax979537Proofs.InputSize
 import Lax979537Proofs.SyntaxOperations
@@ -128,3 +128,16 @@ import Lax979537Proofs.TransitionRules
 import Lax979537Proofs.ReadDerivation
 import Lax979537Proofs.TransitionDerivation
 import Lax979537Proofs.TransitionClosure
+import Lax979537Proofs.InitialPatterns
+import Lax979537Proofs.InitialNodeRules
+import Lax979537Proofs.InitialNodeSemantics
+import Lax979537Proofs.InitialConfigRules
+import Lax979537Proofs.InitialConfigSemantics
+import Lax979537Proofs.InitialNodes
+import Lax979537Proofs.InitialSeeds
+import Lax979537Proofs.CompiledRun
+import Lax979537Proofs.RuleQuery
+import Lax979537Proofs.ClockLast
+import Lax979537Proofs.AcceptRule
+import Lax979537Proofs.AcceptanceFormula
+import Lax979537Proofs.AcceptanceCorrectness

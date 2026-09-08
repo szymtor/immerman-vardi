@@ -2,7 +2,7 @@ import Lax979537.FixedPointEvaluation
 
 /-!
 ---
-title: The Vardi–Immerman theorem
+title: The Immerman–Vardi theorem
 type: theorem
 ---
 On finite linearly ordered relational structures, a query is definable in
@@ -25,7 +25,7 @@ References: Immerman, *Relational Queries Computable in Polynomial Time*
 (STOC 1982).
 -/
 
-namespace Lax979537.VardiImmerman
+namespace Lax979537.ImmermanVardi
 
 open Lax979537.OrderedStructures Lax979537.FixedPointSemantics
 open Lax979537.PolynomialTime
@@ -36,4 +36,4 @@ axiom ptimeDefinable {σ : Vocabulary} {k : Nat} (Q : Query σ k) :
 axiom capturesPtime {σ : Vocabulary} {k : Nat} (Q : Query σ k) :
     Definable Q ↔ InP Q
 
-end Lax979537.VardiImmerman
+end Lax979537.ImmermanVardi

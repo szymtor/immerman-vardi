@@ -1,6 +1,6 @@
 import Lax979537Proofs.NodeAcceptance
 
-namespace VardiImmermanNodeTests
+namespace ImmermanVardiNodeTests
 
 open Turing Lax979537Proofs PersistentStack NodeMachine TimedNodes NodeTrace NodeClosure NodeAcceptance
 
@@ -73,4 +73,4 @@ example (a b : Bool) (N : Nat) (hN : TM2Micro.factor (constantMachine b) ≤ N) 
 #print axioms Lax979537Proofs.NodeClosure.closure_eq_trace
 #print axioms Lax979537Proofs.NodeAcceptance.accepts_iff
 
-end VardiImmermanNodeTests
+end ImmermanVardiNodeTests

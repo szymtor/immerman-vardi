@@ -3,7 +3,7 @@ import Lax979537Proofs.StackExists
 import Lax979537Proofs.StackRename
 import Lax979537Proofs.DecoderCorrectness
 
-namespace VardiImmermanEvaluatorMachineTests
+namespace ImmermanVardiEvaluatorMachineTests
 
 open Lax979537Proofs Lax979537Proofs.StackProgram Lax979537Proofs.StackTransfer
 open StackBoolean Turing
@@ -133,4 +133,4 @@ def checkExtended (xs : List Bool) : Bool :=
 #print axioms StackExists.existsValues_returns
 #print axioms StackExists.any_range_iff
 
-end VardiImmermanEvaluatorMachineTests
+end ImmermanVardiEvaluatorMachineTests

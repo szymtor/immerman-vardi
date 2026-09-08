@@ -2,7 +2,7 @@ specVersion: "1"
 id: lax-979537
 leanVersion: "v4.30.0"
 mathlibVersion: "c5ea00351c28e24afc9f0f84379aa41082b1188f"
-title: "The Vardi–Immerman theorem"
+title: "The Immerman–Vardi theorem"
 authors: []
 bibEntries:
   - |
@@ -36,3 +36,6 @@ bibEntries:
       doi = {10.1145/800070.802186},
       url = {https://www.cs.rice.edu/~vardi/papers/stoc82.pdf}
     }
+issue:
+  repositoryId: 1320232165
+  number: 84

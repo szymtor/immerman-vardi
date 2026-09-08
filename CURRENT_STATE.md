@@ -1,6 +1,30 @@
-# Vardi–Immerman proof implementation
+# Immerman–Vardi proof implementation
 
 Updated: 2026-09-08.
+
+## Current result
+
+Both directions and `ImmermanVardi.capturesPtime` are proved without
+outstanding Lax assumptions. The initialized positive rule system defines
+exactly the encoded machine computation; the acceptance formula and finite
+exception construction finish the reverse implication. All nine annotated
+proofs passed the full Lax build and kernel replay (6m55s overall, 6m48s
+replay). The final regression test passed, and the main theorems depend only
+on `propext`, `Classical.choice`, and `Quot.sound`.
+
+The user requested the name Immerman–Vardi, including the abstract and
+comments. The project directory is now `immerman-vardi`; the theorem modules
+and namespaces are `ImmermanVardi`. Concept statements are unchanged apart
+from this mechanical rename. The renamed Lax build passed (37s), and the
+renamed final regression test and axiom audit passed. Archive submission
+remains to be completed. The local archive ID is `lax-979537`; the current CLI
+reserves this six-digit ID on first submission, independently of its issue
+number. The source repository is https://github.com/szymtor/immerman-vardi.
+
+## Earlier implementation log
+
+The entries below record historical checkpoints; their open obligations have
+been discharged by the current result above.
 
 The user approved the eight concept files and authorized proof implementation
 and completion of the submission. The concepts are frozen and unchanged from
@@ -31,8 +55,8 @@ Seven concept statements have proofs with no outstanding Lax assumptions:
 - StructureEncoding.encodeLength
 - FixedPointEvaluation.evaluationInP
 
-`VardiImmerman.capturesPtime` has an annotated proof relative to precisely
-`VardiImmerman.ptimeDefinable`; its forward direction uses the proved evaluator.
+`ImmermanVardi.capturesPtime` has an annotated proof relative to precisely
+`ImmermanVardi.ptimeDefinable`; its forward direction uses the proved evaluator.
 This conditional assembly must not be described as a complete proof.
 
 Further proved implementation results, all in the proof package:
@@ -82,7 +106,7 @@ finite TM2 and polynomial execution bound in `FormulaDecision`. Its complete
 input/output convention and malformed-input rejection are proved for every
 bit string. The remaining main obligation is:
 
-1. `VardiImmerman.ptimeDefinable`: construct a positive fixed-point formula
+1. `ImmermanVardi.ptimeDefinable`: construct a positive fixed-point formula
    for an arbitrary polynomial-time finite TM2 computation. Renaming and
    tuple ordering, numerical address formulas, a generic positive tableau
    invariant, and a positive-rule syntax compiler are available. The remaining
@@ -126,7 +150,7 @@ was added speculatively, and no imported `proof_wanted` assertion was used.
 
 Provisional id: lax-979537. No remote is configured, authors remain unfilled,
 and nothing has been submitted or published. Do not publish this as a completed
-Vardi–Immerman formalization while the reverse computational direction is open.
+Immerman–Vardi formalization while the reverse computational direction is open.
 The preview uses http://localhost:8125/lax-979537/index.html when running.
 
 Continue with the reverse simulation above. Do not change the approved
@@ -831,8 +855,8 @@ remaining-forward-work plans above:
   polynomial bound in input bit length including all malformed inputs.
   `computableInPolyTime` supplies the actual bundled finite TM2 witness.
 - `FixedPointEvaluation.evaluationInP` now has an unconditional annotated
-  proof. `VardiImmerman.definable_inP` uses it, and the final equivalence's
-  only remaining Lax assumption is `VardiImmerman.ptimeDefinable`.
+  proof. `ImmermanVardi.definable_inP` uses it, and the final equivalence's
+  only remaining Lax assumption is `ImmermanVardi.ptimeDefinable`.
 
 The approved concepts are unchanged. The reverse arbitrary polynomial-time
 TM2-to-FO(LFP) construction and final submission remain unfinished.
@@ -1179,7 +1203,7 @@ the concrete finite transition rule list or its syntactic correctness.
 The parameterized-rule and finite-fact-code regressions passed. The seven theorem axiom audits in
 `tests/FiniteFactCodes.lean` report only `propext`, `Classical.choice`, and
 `Quot.sound`. The approved concepts remain unchanged, and the final theorem
-still explicitly assumes `VardiImmerman.ptimeDefinable`.
+still explicitly assumes `ImmermanVardi.ptimeDefinable`.
 
 Next: construct concrete initialization and transition rules, prove their
 LFP matches the encoded canonical trace, extract acceptance, and integrate

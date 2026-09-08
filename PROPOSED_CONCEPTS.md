@@ -1,4 +1,4 @@
-# Proposed concepts for the Vardi–Immerman theorem
+# Proposed concepts for the Immerman–Vardi theorem
 
 For every fixed finite relational vocabulary σ, every fixed query arity k,
 and every k-ary query Q on finite ordered σ-structures:
@@ -25,7 +25,7 @@ Current proof status is recorded in `CURRENT_STATE.md`.
 | [StructureEncoding](concepts/Lax979537/StructureEncoding.lean) | Unary domain size, dense characteristic tables, and distinguished tuple; injectivity and exact length. |
 | [PolynomialTime](concepts/Lax979537/PolynomialTime.lean) | A concrete finite Turing machine decides the encoded query language in polynomial time and rejects malformed inputs. |
 | [FixedPointEvaluation](concepts/Lax979537/FixedPointEvaluation.lean) | Every fixed FO(LFP) formula has a polynomial-time evaluator. |
-| [VardiImmerman](concepts/Lax979537/VardiImmerman.lean) | Every polynomial-time query is FO(LFP)-definable, and the resulting equivalence. |
+| [ImmermanVardi](concepts/Lax979537/ImmermanVardi.lean) | Every polynomial-time query is FO(LFP)-definable, and the resulting equivalence. |
 
 ## Choices affecting the mathematical meaning
 

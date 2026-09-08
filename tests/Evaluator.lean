@@ -4,7 +4,7 @@ import Mathlib.Data.Fin.VecNotation
 open Lax979537.OrderedStructures Lax979537.FixedPointSyntax
 open Lax979537.StructureEncoding Lax979537Proofs.DecisionProcedure
 
-namespace VardiImmermanTests
+namespace ImmermanVardiTests
 
 def disj {σ : Vocabulary} {m : Nat} {ρ : List Nat}
     (φ ψ : RawFormula σ m ρ) : RawFormula σ m ρ :=
@@ -51,4 +51,4 @@ def nullaryStructure (b : Bool) : PointedStructure [0] 0 :=
 #print axioms Lax979537Proofs.StructureEncoding.encodeInjective
 #print axioms Lax979537Proofs.DecisionProcedure.decideFormula_correct
 
-end VardiImmermanTests
+end ImmermanVardiTests

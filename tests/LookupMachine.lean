@@ -1,7 +1,7 @@
 import Lax979537Proofs.StackLfpValue
 import Lax979537Proofs.StackAtomic
 
-namespace VardiImmermanLookupMachineTests
+namespace ImmermanVardiLookupMachineTests
 
 open Lax979537Proofs Lax979537Proofs.StackProgram Lax979537Proofs.StackTransfer
 open StackBoolean StackTuples Turing
@@ -101,4 +101,4 @@ def lfpCost (n : Nat) : Nat :=
 #print axioms StackTableLookup.lookup_returns
 #print axioms StackLfpValue.evaluate_returns
 
-end VardiImmermanLookupMachineTests
+end ImmermanVardiLookupMachineTests

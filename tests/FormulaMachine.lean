@@ -1,7 +1,7 @@
 import Lax979537Proofs.FormulaLfpCorrectness
 import Mathlib.Data.Fin.VecNotation
 
-namespace VardiImmermanFormulaMachineTests
+namespace ImmermanVardiFormulaMachineTests
 
 open Lax979537.OrderedStructures Lax979537.FixedPointSyntax
 open Lax979537Proofs Lax979537Proofs.StackProgram StackBoolean FormulaProgram Turing
@@ -84,4 +84,4 @@ example {K Aux : Type} [DecidableEq K] : Correct (K := K) (Aux := Aux) reach :=
 #print axioms Lax979537Proofs.FormulaProgram.correct_lfp
 #print axioms Lax979537Proofs.TupleCoordinates.coordinate_ofFn
 
-end VardiImmermanFormulaMachineTests
+end ImmermanVardiFormulaMachineTests

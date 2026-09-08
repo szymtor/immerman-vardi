@@ -1,7 +1,7 @@
 import Lax979537Proofs.StackLfpTables
 import Lax979537Proofs.StackSemanticRounds
 
-namespace VardiImmermanStageMachineTests
+namespace ImmermanVardiStageMachineTests
 
 open Lax979537Proofs Lax979537Proofs.StackProgram Lax979537Proofs.StackTransfer
 open StackBoolean StackTuples Turing
@@ -121,4 +121,4 @@ example (n : Nat) : ∃ c, c ≤ cost n 2 ∧
 #print axioms DenseTables.dense_next
 #print axioms StackSemanticRounds.semantic_rounds_executes
 
-end VardiImmermanStageMachineTests
+end ImmermanVardiStageMachineTests

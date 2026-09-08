@@ -5,7 +5,7 @@ import Lax979537Proofs.StackPower
 import Lax979537Proofs.StackReadRelations
 import Lax979537Proofs.StackCoordinate
 
-namespace VardiImmermanStackTests
+namespace ImmermanVardiStackTests
 
 open Lax979537Proofs.StackProgram Lax979537Proofs.StackTransfer
 open Turing
@@ -244,4 +244,4 @@ def endMachine : FinTM2 := machine endProgram false true (((), true), none)
 
 #print axioms Lax979537Proofs.StackCheckedUnary.checkEnd_executes
 
-end VardiImmermanStackTests
+end ImmermanVardiStackTests

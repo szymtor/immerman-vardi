@@ -1,7 +1,14 @@
 # Proof implementation plan
 
 The user authorized proof implementation and completion on 2026-09-08.
-The approved concept files must remain unchanged.
+The approved concept statements remain unchanged; the user subsequently
+requested the mechanical rename to Immerman–Vardi.
+
+Steps 1–6 and the proof, axiom audit, and full kernel replay portions of step 7
+are complete. The main equivalence has no outstanding Lax assumptions.
+The renamed package build and regression test also pass. Completing archive
+submission remains.
+The checkpoint entries below are a historical implementation log.
 
 1. Prove leastness, the fixed-point equation, and finite convergence.
 2. Prove positivity implies monotonicity through arbitrary nested binders.
