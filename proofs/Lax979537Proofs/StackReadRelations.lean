@@ -87,6 +87,17 @@ noncomputable def costPolynomial : List (Nat × K) → Polynomial Nat
   | [] => Polynomial.C 1
   | (arity, _) :: rest => StackReadTable.costPolynomial arity + costPolynomial rest
 
+def cost : List (Nat × K) → Nat → Nat
+  | [], _ => 1
+  | (arity, _) :: rest, n => StackReadTable.cost arity n + cost rest n
+
+omit [DecidableEq K] in
+theorem eval_costPolynomial (tables : List (Nat × K)) (n : Nat) :
+    (costPolynomial tables).eval n = cost tables n := by
+  induction tables with
+  | nil => simp [costPolynomial, cost]
+  | cons r rest ih => cases r; simp [costPolynomial, cost, StackReadTable.eval_costPolynomial, ih]
+
 /-- Parse every table of a fixed vocabulary. The work stacks are reused;
 the runtime is a fixed sum of polynomials, including malformed inputs. -/
 theorem readTables_executes (w : Workspace K) (tables : List (Nat × K))
@@ -121,5 +132,41 @@ theorem readTables_executes (w : Workspace K) (tables : List (Nat × K))
         (fun r hm => hbound r (by simp [hm])) u hu hrest
       refine ⟨a + b, ?_, Executes.seq hx hy⟩
       simpa only [costPolynomial, Polynomial.eval_add] using Nat.add_le_add ha hb
+
+theorem result_preserves (w : Workspace K) (n : Nat) (tables : List (Nat × K))
+    (key : K) (hi : key ≠ w.input) (ht : ∀ r ∈ tables, key ≠ r.2)
+    (s : BitStore K (Aux × Bool)) : (result w n tables s).stk key = s.stk key := by
+  induction tables generalizing s with
+  | nil => rfl
+  | cons r rest ih =>
+      obtain ⟨arity, table⟩ := r
+      rw [result, ih (fun r hm => ht r (by simp [hm]))]
+      exact StackReadTable.result_preserves _ _ _ hi (ht (arity, table) (by simp)) _ _ _
+
+theorem tables_ready (w : Workspace K) (n : Nat) (tables : List (Nat × K))
+    (hf : ∀ r ∈ tables, Fresh w r.2) (s : BitStore K (Aux × Bool)) (hs : Ready w n s) :
+    Ready w n (result w n tables s) := by
+  induction tables generalizing s with
+  | nil => exact hs
+  | cons r rest ih =>
+      obtain ⟨arity, table⟩ := r
+      exact ih (fun r hm => hf r (by simp [hm])) _
+        (result_ready w table (hf (arity, table) (by simp)) n arity s hs)
+
+theorem input_length_le (w : Workspace K) (n : Nat) (tables : List (Nat × K))
+    (hf : ∀ r ∈ tables, Fresh w r.2) (s : BitStore K (Aux × Bool)) :
+    ((result w n tables s).stk w.input).length ≤ (s.stk w.input).length := by
+  induction tables generalizing s with
+  | nil => exact le_refl _
+  | cons r rest ih =>
+      obtain ⟨arity, table⟩ := r
+      have h := ih (fun r hm => hf r (by simp [hm])) (StackReadTable.result w.input table n arity s)
+      have hi : w.input ≠ table := by
+        have hf' := (hf (arity, table) (by simp)).1
+        simp only [List.mem_cons, List.not_mem_nil, not_false_eq_true, not_or, and_true] at hf'
+        tauto
+      simp only [StackReadTable.result, Function.update_of_ne hi, Function.update_self,
+        List.length_drop] at h
+      exact h.trans (Nat.sub_le _ _)
 
 end Lax979537Proofs.StackReadRelations

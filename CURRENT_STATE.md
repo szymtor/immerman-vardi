@@ -303,3 +303,67 @@ Lean axioms. Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color`
 passed in 5m13s (kernel replay 4m45s), with eight concepts and seven annotated
 proofs. The concepts are unchanged from cf16245. The two main directions
 remain open, and nothing has been submitted or published.
+
+## Assembled finite decoder checkpoint
+
+The finite decoder is now assembled, with four new checked modules:
+
+- `StackReadCoordinates`: iteration over all pointed coordinates, preservation
+  of previous data, and a linear bound for fixed query arity. Together with
+  new `StackReadRelations` lemmas, this proves input suffixes never grow and
+  the private workspace is reusable between phases.
+- `StackDecoder`: a `Layout` contains the workspace, tables, coordinates,
+  distinctness, freshness, and fixed arity bounds. `decode` sequences checked
+  unary header parsing, all relation tables, all pointed coordinates, and
+  trailing-input rejection. `decode_executes` proves termination on every
+  input within one polynomial in the ORIGINAL input length, reaching its
+  explicit pure store result. No correctness of that store result relative
+  to semantic structures is assumed in this theorem.
+- `FiniteDecoder`: an explicit finite port type for every vocabulary σ and
+  query arity k: Fin 5 plus a counter pool of size σ.sum, relation ports, and
+  coordinate ports. Every arity is at most σ.sum. `layout`, `program`, and
+  `decoderMachine` instantiate all abstract layout obligations.
+  `program_executes` gives the polynomial structured execution, and
+  `decoder_runs` transfers it to actual TM2 steps from `Turing.initList` to the
+  halted result configuration. `cost` is an executable polynomial bound,
+  related to the polynomial witness by `eval_costPolynomial`.
+- `DecoderSoundness`: reverse parsing laws for unary fields, dense relation
+  tables, and pointed tuples. Tuple enumeration has no duplicates, and
+  `readTable_map` reconstructs each dense table exactly. `decode_sound` proves
+  `Decoding.decode σ k w = some A → encode A = w` for every input, and
+  `checkedDecode_eq_decode` removes the extra serialization check semantically.
+  No approved concept was changed, nor was the existing decision function
+  weakened or redefined.
+
+`tests/DecoderMachine.lean` runs the assembled finite TM2, comparing its result
+with `Decoding.decode`, including every stored table and coordinate on valid
+inputs and workspace cleanup on all inputs. Mixed/nullary relations, empty
+domains, out-of-range or missing coordinates, trailing data, and insufficient
+table input are covered. It also checks every bit string of length 0–5 for
+signatures [0,1] with query arity 1 and [2] with query arity 0. These tests
+pass. Audited theorems use only the standard Lean axioms.
+
+The GENERAL machine/semantic-decoder correspondence remains to be proved:
+the tests provide examples, not that theorem. The concrete decoder's explicit
+result still needs to be shown to have validity true exactly when
+`Decoding.decode` succeeds, with matching domain size, relation bit tables,
+and unary pointed coordinates. `DecoderSoundness.decode_sound` handles the
+canonical-encoding half AFTER this correspondence; it does not establish
+that correspondence by itself. Then implement the formula evaluator over
+the retained tables/counters. Both main concept obligations remain open.
+
+Next proof target: observe the final `StackDecoder.result (FiniteDecoder.layout σ k)`
+as an optional decoded structure. Relate the sticky validity convention and
+stored payloads to the semantic parser phase by phase. The existing
+`StackReadRelations.result_preserves`, `StackReadCoordinates.result_preserves`,
+`StackReadTable.result_table`, `StackCoordinate.result_valid`, and unary
+reverse parsing laws provide the local ingredients. Distinct finite port
+constructors eliminate all cross-phase aliasing cases. The counter pool uses
+σ.sum solely for convenient fixed layout bounds; runtime needs only polytime.
+
+Checkpoint validation: `tests/DecoderMachine.lean` passes, including the
+concrete `decoder_runs` axiom audit. Full
+`env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in 5m46s
+(kernel replay 5m25s): eight concepts and seven annotated proofs. All four
+new modules were included. The approved concepts remain unchanged, both
+main concept obligations remain open, and no submission was made.

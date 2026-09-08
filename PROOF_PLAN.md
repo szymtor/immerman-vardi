@@ -98,6 +98,13 @@ input. Assemble these into a finite-layout decoder and prove its exact
 correspondence with the existing semantic decoder next. See `CURRENT_STATE.md`
 for the compatible control-state convention and port reuse.
 
+The full finite decoder is now assembled in `StackDecoder` and `FiniteDecoder`,
+with an actual TM2 execution theorem bounded by a polynomial in original input
+length. `DecoderSoundness` proves that semantic decoding already enforces
+canonical encodings, so no extra serialization pass is needed. The next
+obligation is GENERAL correspondence between the concrete decoder's result
+and `Decoding.decode`; compiled-machine tests currently verify examples only.
+
 Store domain/tuple coordinates as unary
 counters on separate stacks, and relations as dense bit tables. This avoids
 word-size simulation work: even full table scans and unary arithmetic cost

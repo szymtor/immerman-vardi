@@ -31,6 +31,12 @@ theorem splitUnary_correct (xs : List Bool) :
           simp only [Decoding.readUnary, splitUnary, ih]
           cases (splitUnary xs).2 <;> rfl
 
+theorem splitUnary_rest_le (xs : List Bool) :
+    ((splitUnary xs).2.getD []).length ≤ xs.length := by
+  induction xs with
+  | nil => simp [splitUnary]
+  | cons b xs ih => cases b <;> simp only [splitUnary, List.length_cons, Option.getD_some] <;> omega
+
 def body (src counter : K) : BitProgram K Aux :=
   .seq (.atom (.push counter (fun _ => true))) (read src)
 
