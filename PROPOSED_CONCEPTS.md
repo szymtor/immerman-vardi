@@ -12,8 +12,9 @@ axiom capturesPtime {σ : Vocabulary} {k : Nat} (Q : Query σ k) :
     Definable Q ↔ InP Q
 ```
 
-In Lax, `axiom` declares a statement to be proved separately. None of these
-statements is being presented as proved.
+In Lax, `axiom` declares a statement to be proved separately. These concepts
+were approved for proof implementation on 2026-09-08 and are now frozen.
+Current proof status is recorded in `CURRENT_STATE.md`.
 
 | Concept | Mathematical content |
 |---|---|
