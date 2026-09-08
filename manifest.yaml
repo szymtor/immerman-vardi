@@ -3,7 +3,10 @@ id: lax-979537
 leanVersion: "v4.30.0"
 mathlibVersion: "c5ea00351c28e24afc9f0f84379aa41082b1188f"
 title: "The Immerman–Vardi theorem"
-authors: []
+authors:
+  - name: "Szymon Toruńczyk"
+    github: "szymtor"
+  - name: "Codex 6"
 bibEntries:
   - |
     @book{Libkin2004,
