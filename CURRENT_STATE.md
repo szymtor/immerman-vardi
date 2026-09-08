@@ -558,3 +558,71 @@ axiom audits use only standard Lean axioms. Full
 identical to cf16245. Lax still reports eight concepts and seven annotated
 proofs: the final assembly depends on the two open computational directions.
 No submission was made; the full goal remains active.
+
+## Bounded materialized LFP iteration
+
+The complete iterative part of the LFP machine is now implemented and proved:
+
+- `StackStages.stages_executes` prepares n^k with the verified power routine,
+  uses a fixed bounded loop to execute a supplied stage body exactly n^k
+  times, and clears all stage counters. Its result is the mathematical
+  function iterate of the semantic payload transformer. The program contains
+  neither n nor an input-dependent stage count as a control constant.
+- `StackInitialTable.initialize_executes` constructs n^k false bits using
+  the materializer with the constant-false evaluator. The empty relation has
+  one false bit at arity zero, including over the empty domain.
+- `StackTableStages.tableStages_executes` specializes the stage loop to
+  actual `StackTableRound` executions. A family of semantic payloads has
+  dense tables of length n^k; each body callback supplies a bounded Boolean
+  answer for one valid tuple in the current payload. The theorem derives
+  complete repeated table updates from these callback executions; it does
+  not assume correctness or executions of the stage loop.
+- `StackLfpTables.run_executes` composes false-table initialization and the
+  n^k rounds. It retains the final table and restores every other stack.
+  Fixed polynomials bound actual executions, given a polynomial callback
+  bound. Final lookup and deletion of the retained private table remain the
+  responsibility of the full LFP constructor.
+- `DenseTables` connects list-of-tuples semantic relations to their dense
+  bit tables. Natural-list tuple observations are injective; every valid
+  natural tuple represents a Fin-valued tuple, including empty cases.
+  `predicate_values` transfers callback semantics to that representation,
+  and `dense_next` relates materialized bits to filtering canonical tuples.
+- `StackSemanticRounds.semantic_rounds_executes` now proves that the retained
+  machine table is exactly `dense (TableEvaluation.rounds (next p) (n^k))`.
+  The recursive body premise uses ordinary Fin-valued tuples and the current
+  semantic relation. This is the same rounds operation used by the existing
+  verified FO(LFP) semantic evaluator.
+
+The remaining forward-direction work is table lookup, the general formula
+compiler with finite private-port allocation and input invariants, and final
+machine cleanup/output assembly. The iterative LFP subroutine above does not
+by itself prove `evaluationInP`. The reverse machine-to-formula simulation
+also remains open, and the final concept theorem remains conditional.
+
+`tests/StageMachine.lean` checks actual machines for domain sizes 0–3 and
+arities 0–2. The generic stage loop emits successive stage coordinates, so
+the tests check both its n^k count and traversal order. Table iteration is
+tested with a toggling transformer to detect the exact number of rounds;
+that deliberately nonmonotone transformer is a test of the general bounded
+iteration program, not a claimed positive LFP formula. A symbolic proof
+instantiates false-table initialization and all n^2 table stages for every n,
+using a real peek operation on the retained current table as its callback.
+The tests check all temporary-stack cleanup and populated unrelated stacks.
+Dense-table examples include nullary and empty-domain cases and a nonconstant
+order table. All tests pass, and the axiom audit reports only standard Lean
+axioms. Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed
+in 7m31s (kernel replay 7m20s), including all six new proof modules. Concepts
+remain identical to cf16245. Lax still reports eight concepts and seven
+annotated proofs; both main computational directions remain open and the
+final assembly remains conditional. Nothing was submitted.
+
+Next table-access option: accumulate a unary tuple rank with fixed Horner
+steps `index := n * index + coordinate`, then copy the source table and use
+the existing linear skip/lookup routine. One Horner step can transfer the
+old index into a private counter, repeat domain-copy once per old-index
+token, and append a copy of the coordinate counter. Input coordinate ports
+may repeat; only their separation from the workspace is needed. At arity
+zero the index is zero. `StackLookup.skip_executes` already supports the
+evaluation control type, so a Boolean-returning final pop and cleanup can
+reuse it without a general change-of-control compiler. This is the next
+implementation plan, not a proved lookup constructor yet.

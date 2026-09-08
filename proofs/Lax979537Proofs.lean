@@ -46,3 +46,9 @@ import Lax979537Proofs.StackExists
 import Lax979537Proofs.StackTuples
 import Lax979537Proofs.StackMaterialize
 import Lax979537Proofs.StackTableRound
+import Lax979537Proofs.StackStages
+import Lax979537Proofs.StackInitialTable
+import Lax979537Proofs.StackTableStages
+import Lax979537Proofs.StackLfpTables
+import Lax979537Proofs.DenseTables
+import Lax979537Proofs.StackSemanticRounds

@@ -136,6 +136,16 @@ new one, then replaces it in canonical order and cleans the buffers.
 Table access, n^k-stage iteration from the all-false table, and the general
 formula compilation proof still remain. The reverse simulation is unchanged.
 
+Bounded materialized LFP iteration is now proved in `StackStages`,
+`StackInitialTable`, `StackTableStages`, and `StackLfpTables`: build the
+all-false table, run n^k actual table rounds, retain the final table, and
+restore all other stacks. `DenseTables` and `StackSemanticRounds` identify
+the retained result with the rounds of the existing semantic evaluator.
+The recursive body premise is a bounded actual Boolean execution for each
+valid tuple in the represented current relation. Table lookup, the general
+formula compiler, and final output/cleanup assembly remain for the forward
+direction. These results do not close either main concept axiom.
+
 For the reverse direction, assess a direct persistent-stack encoding before
 adding a full single-tape simulator. A TM2 configuration can be represented
 by time, finite control/label, and one node pointer per stack. Initial input
