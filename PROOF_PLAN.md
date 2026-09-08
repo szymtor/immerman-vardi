@@ -80,8 +80,18 @@ header into a unary counter, preserves the remaining input, and distinguishes
 a delimiter from exhaustion; `splitUnary_correct` links it to the existing
 decoder. These routines are actual compiled stack programs.
 
-Next, implement preserving copy, unary-counter comparisons, and repetition
-controlled by a copied unary bound. Store domain/tuple coordinates as unary
+`StackCopy` now implements source-preserving copy through one temporary
+stack, including a store-level framing interface. `StackRepeat` implements
+counter-controlled iteration, with a general invariant and a bound on actual
+compiled body executions. `StackClear` provides cleanup. `StackCompare`
+compares counter lengths, cleans both counters, and leaves a Boolean result;
+`StackLookup` consumes an index and returns a table bit or exhaustion.
+`StackPower` uses nested copied counters to generate n^k tokens, with a
+polynomial depending only on k and all temporary counters returned empty.
+These proofs cover arbitrary surrounding stack contents and auxiliary state.
+
+Next, implement bounded table-prefix extraction and the concrete input
+decoder, using the power routine for relation table lengths. Store domain/tuple coordinates as unary
 counters on separate stacks, and relations as dense bit tables. This avoids
 word-size simulation work: even full table scans and unary arithmetic cost
 only polynomial overhead for fixed arities. Formula recursion chooses a fixed

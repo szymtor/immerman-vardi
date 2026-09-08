@@ -174,10 +174,60 @@ The direct structured stack-program compiler is now implemented and checked:
 
 No imported `proof_wanted` assertion or Lax assumptions are used in this
 compiler. The compiler is general, but it does NOT yet contain the formula
-evaluator. Continue with preserving copy, unary comparisons, bounded loops,
-dense-table lookup, and the formula evaluator in this structured language.
+evaluator. The next checkpoint below adds its concrete counter and table
+primitives; continue with the input decoder and formula evaluator in this language.
 Use unary counter stacks and generous table scans to avoid unnecessary
 word-size bounds. See the detailed continuation plan in `PROOF_PLAN.md`.
+
+## Counter and table machine checkpoint
+
+Six more proof modules now compile:
+
+- `StackCopy.copy_executes` restores the source, prepends its contents in
+  order to the destination, and clears its temporary stack. `copy_store`
+  gives a whole-store interface with all unrelated stacks preserved.
+- `StackRepeat.repeat_executes` bounds actual executions of a body repeated
+  once per counter token. The invariant is stable under counter reads and
+  the body; the body may change scratch control. `result_spec` proves the
+  counter is empty and scratch is reset on return.
+- `StackClear.clear_store` empties a stack with a linear machine bound.
+- `StackCompare.less_executes` compares lengths, returns the correct Boolean,
+  empties both argument counters, and preserves the rest of the store.
+- `StackLookup.lookup_executes` skips a unary index, returns the indexed bit
+  or exhaustion, and preserves unrelated stacks. Out-of-range indices are
+  included in the specification.
+- `StackPower.power_executes` generates n^k unary tokens using one private
+  counter per nesting level. It preserves the domain counter and restores
+  all private counters; its explicit polynomial depends only on k. This
+  includes k=0 and n=0. `cost` is the executable bound; `costPolynomial` is
+  its polynomial witness, with `eval_costPolynomial` connecting them.
+
+The two main concept axioms remain open. These primitives are proofs about
+actual structured programs compiled to TM2, but they do not yet form the
+complete decoder or evaluator.
+
+Next implementation: bounded prefix extraction from the input stack into a
+relation-table stack, with a finite-control validity flag for exhaustion.
+Use `StackPower` to produce the fixed-arity table-length counters. Parse the
+size header once, then each dense relation table and the pointed coordinates;
+compare coordinate counters against the domain and reject trailing input.
+The existing Lean decoder gives the semantic specification. Follow with
+tuple enumeration and the recursive FO(LFP) evaluator.
+
+The expanded `tests/StackMachine.lean` passes. It executes the compiled TM2
+machines for source-preserving copy with a nonempty destination, repetition
+whose body clears scratch, all counter comparisons for lengths 0–4, indexed
+lookup including exhaustion, and powers for n,k in 0–3. The checks include
+halting, work-stack cleanup, control reset, and unchanged unrelated stacks.
+All newly audited theorem axiom sets contain only the standard propext,
+Classical.choice, and Quot.sound (some use fewer). The approved concepts are
+unchanged, and no sorry, new axiom, or opaque declaration was introduced.
+
+Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in
+4m17s (kernel replay 3m55s), covering all six new modules. Lax still reports
+eight concepts and seven annotated proofs: six unconditional concept proofs
+and the conditional final assembly. No additional main concept obligation
+was closed at this checkpoint.
 
 The reverse expressive direction also remains open; the concrete TM2-to-
 tableau instantiation has not advanced in this compiler iteration.

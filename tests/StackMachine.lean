@@ -1,4 +1,7 @@
 import Lax979537Proofs.StackUnary
+import Lax979537Proofs.StackCompare
+import Lax979537Proofs.StackLookup
+import Lax979537Proofs.StackPower
 
 namespace VardiImmermanStackTests
 
@@ -82,5 +85,82 @@ example (base : Fin 3 → List Bool) (xs ys : List Bool) :
 #print axioms Lax979537Proofs.StackTransfer.reverse_polytime
 #print axioms Lax979537Proofs.StackUnary.parse_executes
 #print axioms Lax979537Proofs.StackUnary.splitUnary_correct
+
+def copyProgram : BitProgram (Fin 4) Unit := Lax979537Proofs.StackCopy.copy 0 1 2
+def copyMachine : FinTM2 := machine copyProgram 0 1 ((), none)
+
+def checkCopy (xs ys : List Bool) : Bool :=
+  let s := Lax979537Proofs.StackCopy.working3 (fun _ : Fin 4 => [false, true])
+    0 1 2 xs ys [] () (some true)
+  let c := runFuel copyMachine (7 * xs.length + 4) (config (some (entry copyProgram)) s)
+  c.l.isNone && eqBits (c.stk (0 : Fin 4)) xs && eqBits (c.stk (1 : Fin 4)) (xs ++ ys) &&
+    eqBits (c.stk (2 : Fin 4)) [] && eqBits (c.stk (3 : Fin 4)) [false, true] && unitState c.var none
+
+#guard checkCopy [] [true]
+#guard checkCopy [true, false, false] [false, true]
+
+-- The body deliberately clears scratch. Counter repetition must still finish
+-- all iterations, using its own read after each body execution.
+def repeatProgram : BitProgram Bool Unit :=
+  Lax979537Proofs.StackRepeat.repeatCount false
+    (.seq (.atom (.push true (fun _ => true))) (.atom (.load (fun _ => ((), none)))))
+def repeatMachine : FinTM2 := machine repeatProgram false true ((), none)
+
+#guard (List.range 6).all fun n =>
+  let c := runFuel repeatMachine (5 * n + 10) (initList repeatMachine (List.replicate n false))
+  c.l.isNone && eqBits (c.stk false) [] && eqBits (c.stk true) (List.replicate n true) &&
+    unitState c.var none
+
+def compareProgram : BitProgram (Fin 3) (Unit × Bool) :=
+  Lax979537Proofs.StackCompare.less 0 1
+def compareMachine : FinTM2 := machine compareProgram 0 1 (((), false), none)
+def comparisonState (s : (Unit × Bool) × Option Bool) (b : Bool) : Bool :=
+  s == (((), b), none)
+
+#guard (List.range 5).all fun n => (List.range 5).all fun m =>
+  let s := working (fun _ : Fin 3 => [true, false]) 0 1
+    (List.replicate n true) (List.replicate m true) ((), true) (some false)
+  let c := runFuel compareMachine (5 * (n + m) + 8) (config (some (entry compareProgram)) s)
+  c.l.isNone && eqBits (c.stk (0 : Fin 3)) [] && eqBits (c.stk (1 : Fin 3)) [] &&
+    eqBits (c.stk (2 : Fin 3)) [true, false] && comparisonState c.var (decide (n < m))
+
+def lookupProgram : BitProgram (Fin 3) (Unit × Option Bool) :=
+  Lax979537Proofs.StackLookup.lookup 0 1
+def lookupMachine : FinTM2 := machine lookupProgram 0 1 (((), none), none)
+def lookupState (s : (Unit × Option Bool) × Option Bool) (b : Option Bool) : Bool :=
+  s == (((), b), none)
+
+#guard (List.range 6).all fun n =>
+  let bits := [true, false, false, true]
+  let s := working (fun _ : Fin 3 => [false, true]) 0 1
+    (List.replicate n true) bits ((), some false) (some true)
+  let c := runFuel lookupMachine (3 * n + 3) (config (some (entry lookupProgram)) s)
+  c.l.isNone && eqBits (c.stk (0 : Fin 3)) [] && eqBits (c.stk (1 : Fin 3)) (bits.drop (n + 1)) &&
+    eqBits (c.stk (2 : Fin 3)) [false, true] && lookupState c.var bits[n]?
+
+#print axioms Lax979537Proofs.StackCopy.copy_executes
+#print axioms Lax979537Proofs.StackRepeat.repeat_executes
+#print axioms Lax979537Proofs.StackRepeat.result_spec
+#print axioms Lax979537Proofs.StackClear.clear_store
+#print axioms Lax979537Proofs.StackCompare.less_executes
+#print axioms Lax979537Proofs.StackLookup.lookup_executes
+
+def powerProgram (k : Nat) : BitProgram (Fin 7) Unit :=
+  Lax979537Proofs.StackPower.power 0 1 2 (([3, 4, 5] : List (Fin 7)).take k)
+def powerMachine (k : Nat) : FinTM2 := machine (powerProgram k) 0 1 ((), none)
+
+#guard (List.range 4).all fun k => (List.range 4).all fun n =>
+  let s : BitStore (Fin 7) Unit := ⟨((), some true), fun p =>
+    if p = 0 then List.replicate n true else
+    if p = 1 then [false] else if p = 6 then [false, true] else []⟩
+  let fuel := Lax979537Proofs.StackPower.cost k n
+  let c := runFuel (powerMachine k) fuel (config (some (entry (powerProgram k))) s)
+  c.l.isNone && eqBits (c.stk (0 : Fin 7)) (List.replicate n true) &&
+    eqBits (c.stk (1 : Fin 7)) (List.replicate (n ^ k) true ++ [false]) &&
+    ([2, 3, 4, 5] : List (Fin 7)).all (fun p => eqBits (c.stk p) []) &&
+    eqBits (c.stk (6 : Fin 7)) [false, true] && unitState c.var none
+
+#print axioms Lax979537Proofs.StackCopy.copy_store
+#print axioms Lax979537Proofs.StackPower.power_executes
 
 end VardiImmermanStackTests

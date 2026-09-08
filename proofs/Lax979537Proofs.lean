@@ -19,3 +19,9 @@ import Lax979537Proofs.FiniteExceptions
 import Lax979537Proofs.StackProgram
 import Lax979537Proofs.StackTransfer
 import Lax979537Proofs.StackUnary
+import Lax979537Proofs.StackCopy
+import Lax979537Proofs.StackRepeat
+import Lax979537Proofs.StackClear
+import Lax979537Proofs.StackCompare
+import Lax979537Proofs.StackLookup
+import Lax979537Proofs.StackPower
