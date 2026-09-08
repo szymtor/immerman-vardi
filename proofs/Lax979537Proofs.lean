@@ -58,3 +58,10 @@ import Lax979537Proofs.TupleRank
 import Lax979537Proofs.StackReadBit
 import Lax979537Proofs.StackTableLookup
 import Lax979537Proofs.StackLfpValue
+import Lax979537Proofs.TupleCoordinates
+import Lax979537Proofs.StackLfpArity
+import Lax979537Proofs.FormulaProgram
+import Lax979537Proofs.FormulaRepresentation
+import Lax979537Proofs.FormulaCorrectness
+import Lax979537Proofs.LfpWorkspace
+import Lax979537Proofs.FormulaLfpCorrectness

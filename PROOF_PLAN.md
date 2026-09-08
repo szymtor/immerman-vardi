@@ -157,6 +157,17 @@ finite-workspace compiler and its representation/correctness induction are
 the next main forward obligation. See the latest section of `CURRENT_STATE.md`
 for a recursive finite workspace type and the intended compiler invariant.
 
+That compiler is now complete: `FormulaProgram.compile_correct` proves
+bounded actual execution for every raw formula, using a finite workspace
+determined by syntax and the represented structure/variable/relation
+environment. It covers arbitrary nesting and restores every stack. The
+remaining forward work is composition with the concrete decoder, checking
+its retained unary coordinate words, then clearing the fixed set of ports
+and producing the singleton Boolean output with reset control. The latest
+`CURRENT_STATE.md` section gives the concrete interfaces and a coarse cleanup
+bound. The two main concept axioms remain open pending that assembly and the
+reverse simulation below.
+
 For the reverse direction, assess a direct persistent-stack encoding before
 adding a full single-tape simulator. A TM2 configuration can be represented
 by time, finite control/label, and one node pointer per stack. Initial input

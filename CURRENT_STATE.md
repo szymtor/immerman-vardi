@@ -736,3 +736,75 @@ Two interface details should be handled before the compiler induction:
    substituting k using the first equality and applying the existing theorem.
    Keep tupleSlots an independent list parameter in the wrapper statement;
    this makes the substitution straightforward. No concept change is needed.
+
+## General formula compiler completed
+
+The preceding compiler plan is now implemented. `FormulaProgram.compile`
+constructs a fixed actual stack program from raw syntax and port maps.
+`Work φ` has explicit recursive Fintype and DecidableEq instances; the
+compiler contains no structure, domain size, or semantic evaluator parameter.
+`FormulaRepresentation` connects unary element stacks and dense relation
+tables to the semantic environments, with framing and binder-extension
+lemmas. Element ports may alias; private work ports must be injective and
+fresh from inputs. `TupleCoordinates.coordinate_ofFn`, `StackLfpArity`,
+and `LfpWorkspace` provide the binder interface and private-port geometry.
+
+`FormulaProgram.compile_correct` in `FormulaLfpCorrectness.lean` is proved
+by structural induction for EVERY raw formula, including arbitrary nested
+LFP and existential binders. It gives an actual `StackBoolean.Returns`
+execution bounded by `(costPolynomial φ).eval A.size`, preserving every
+stack and the outer auxiliary control state. No admissibility assumption
+is needed for finite-round evaluation; the existing semantic correctness
+theorem supplies the LFP interpretation for admissible formulas. The
+compiler theorem and LFP case use only standard Lean axioms.
+
+This completes the general compiler induction, but not `evaluationInP`.
+The next step is decoder/evaluator/output composition:
+
+1. Use ambient ports `FiniteDecoder.Port σ m ⊕ Work φ` and embed the
+   decoder with `StackRename.executes_in_sum`, leaving all evaluator work
+   empty. `FiniteDecoder.program_executes` gives its structured execution.
+2. Strengthen the decoder interface from coordinate LENGTH to the actual
+   unary coordinate word. `DecoderCorrectness.Represents.coords` currently
+   only supplies the length. `StackCheckedUnary.result` prepends true tokens
+   to the initially empty coordinate; `StackCheckBound.result` preserves
+   stacks, and later coordinate parses preserve earlier coordinate ports.
+   Prove this through `StackReadCoordinates.result`, then combine with
+   `DecoderCorrectness.result_represents`. Input tables/domain are already
+   in the exact required representation. No concept change is needed.
+3. Branch on decoder validity, run the compiler on valid inputs, and return
+   false on malformed input. `DecoderAgreement.accepts_iff_encoding` and
+   exact decoding agreement provide the semantic link. Work ports are the
+   right summand; input ports are the left summand and statically distinct.
+4. Clear every finite stack port, retain the Boolean in control, put its
+   singleton output on the designated output stack, and reset finite control
+   to the machine's initial value. A simple coarse bound avoids finite sums:
+   prove by induction on `Executes` that EACH stack length grows by at most
+   the execution cost. Thus each decoded stack has length at most
+   `M = input length + decoder cost`, even on malformed input. The evaluator
+   restores all stacks. Clear a fixed list of all ports at cost at most
+   `(2*M + 2) * number of ports + 1`; `StackClear.clear_store` preserves
+   auxiliary control and resets scratch, so the answer survives. Finish
+   with a push of `state.1.2` onto the output and a load of the initial
+   control. The finite port count is a formula-dependent constant.
+5. Bound the valid domain size by input length (`InputSize`), use polynomial
+   evaluation monotonicity, and apply `StackProgram.program_polytime` to
+   produce the exact required `TM2ComputableInPolyTime` instance. Do not use
+   mathlib's unproved composition assertion.
+
+The reverse arbitrary-TM2 simulation remains open. Both main concept axioms
+and the authorized final submission remain pending.
+
+Validation for this checkpoint: `tests/FormulaMachine.lean` passes actual
+compiled TM2 runs for forward/backward/reflexive directed reachability,
+an inner LFP reading the outer relation while retaining free parameters,
+empty existential quantification, empty-domain nullary relation bits, and
+nested nullary fixed points. Every run checks all stack contents after
+return, including a populated unrelated stack. A symbolic instantiation
+uses `compile_correct` at arbitrary ambient port and auxiliary-state types.
+The audited compiler/LFP theorems use only propext, Classical.choice, and
+Quot.sound; coordinate observation uses only propext and Quot.sound.
+Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passed in
+9m35s (kernel replay 9m06s), including all seven new modules. Concepts remain
+identical to cf16245. Lax reports eight concepts and seven annotated proofs;
+the two main computational axioms remain open. Nothing was submitted.
