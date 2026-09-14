@@ -84,7 +84,7 @@ theorem eval_rename {σ : Vocabulary} {m : Nat} {ρ : List Nat}
         funext R
         apply Set.ext
         intro a
-        simpa only [append_comp_liftBlock] using
+        simpa only [Set.mem_setOf_eq, append_comp_liftBlock] using
           ih (liftBlock k f) (Fin.append a v) (extend R η)
       change Lax751879.LeastFixedPoints.leastFixedPoint _ (v ∘ (f ∘ args)) ↔
         Lax751879.LeastFixedPoints.leastFixedPoint _ ((v ∘ f) ∘ args)

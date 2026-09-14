@@ -40,7 +40,7 @@ theorem segments_sorted (σ : Vocabulary) (m : Nat) :
   have ht : ((List.finRange σ.length).map (Segment.table (m := m))).Pairwise
       (fun s t => tag s < tag t) := by
     apply List.pairwise_map.mpr
-    exact (finRange_sorted _).imp (fun {_ _} h => by simpa only [tag, Nat.add_lt_add_iff_left] using h)
+    exact (finRange_sorted _).imp (fun {_ _} h => by simpa only [tag, Nat.add_lt_add_iff_left] using! h)
   have hc : ((List.finRange m).flatMap
       (fun i => [Segment.coordinate (σ := σ) i, .coordinateEnd i])).Pairwise
       (fun s t => tag s < tag t) := by
@@ -81,7 +81,7 @@ theorem code_lex_of_local {σ : Vocabulary} {m n w : Nat} (hn : tagBound σ m �
   refine Fin.cases ?_ ?_ j hj
   · intro _; rfl
   · intro k hk
-    have hki : k.val < i.val := by simpa using hk
+    have hki : k.val < i.val := by simpa using! hk
     have hks : k.val < s.arity := hki.trans i.isLt
     simpa [code, hks] using hp ⟨k.val, hks⟩ hki
 

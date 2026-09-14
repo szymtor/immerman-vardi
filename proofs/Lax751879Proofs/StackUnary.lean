@@ -81,7 +81,7 @@ theorem loop_executes [DecidableEq K] (base : K → List Bool) (src counter : K)
           have ht : (1 + 1) + (3 * (splitUnary xs).1 + 1) + 1 =
               3 * ((splitUnary xs).1 + 1) + 1 := by omega
           simpa only [splitUnary, List.tail_cons, List.head?_cons, List.replicate_succ',
-            List.append_assoc, List.singleton_append, ht] using hh
+            List.append_assoc, List.singleton_append, ht] using! hh
 
 theorem parse_executes [DecidableEq K] (base : K → List Bool) (src counter : K)
     (hne : src ≠ counter) (xs ys : List Bool) (a : Aux) (scratch : Option Bool) :
@@ -94,7 +94,7 @@ theorem parse_executes [DecidableEq K] (base : K → List Bool) (src counter : K
   rw [pop_working base src counter hne] at hr
   have h := Executes.seq hr (loop_executes base src counter hne xs ys a)
   have ht : 1 + (3 * (splitUnary xs).1 + 1) = 3 * (splitUnary xs).1 + 2 := by omega
-  simpa only [ht] using h
+  simpa only [ht] using! h
 
 theorem parse_linear_bound (xs : List Bool) :
     3 * (splitUnary xs).1 + 2 ≤ 3 * xs.length + 2 := by

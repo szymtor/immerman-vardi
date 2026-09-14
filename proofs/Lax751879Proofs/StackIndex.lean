@@ -43,7 +43,7 @@ theorem build_executes (domain index counter tmp : K) (coords : List K)
   | nil =>
       refine ⟨1, by simp [budget], ?_⟩
       have h := Executes.atom (.load (fun q : Aux × Option Bool => (q.1, none))) s
-      simpa [build, value, setIndex, ← hindex] using h
+      simpa [build, value, setIndex, ← hindex] using! h
   | cons coord coords ih =>
       have hcoord := hfresh coord (by simp)
       have hv := hbound coord (by simp)

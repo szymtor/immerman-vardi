@@ -27,7 +27,7 @@ theorem prefix_eq_take (n : Nat) (xs : List Bool) (h : n ≤ xs.length) :
 
 theorem enough_succ (n : Nat) (xs : List Bool) :
     (xs.head?.isSome && decide (n ≤ xs.tail.length)) = decide (n + 1 ≤ xs.length) := by
-  cases xs <;> simp
+  cases xs <;> simp <;> rfl
 
 def body (src dst : K) : BitProgram K (Aux × Bool) :=
   .seq (.atom (.pop src (fun s b => ((s.1.1, s.1.2 && b.isSome), b))))
@@ -67,7 +67,7 @@ theorem result_working (base : K → List Bool) (counter src dst : K)
   induction xs generalizing ys zs valid scratch with
   | nil =>
       simpa only [result, List.length_nil, List.drop_zero, paddedPrefix, List.reverse_nil,
-        List.nil_append, Nat.zero_le, decide_true, Bool.and_true] using
+        List.nil_append, Nat.zero_le, decide_true, Bool.and_true] using!
         pop_working3 base counter src dst hcs hcd [] ys zs (a, valid) scratch
   | cons b bs ih =>
       simp only [List.length_cons, result]

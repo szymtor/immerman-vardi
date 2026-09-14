@@ -35,7 +35,7 @@ theorem clearLoop_executes (base : K → List Bool) (src : K) (xs : List Bool) (
       rw [pop_working] at hr
       have hh := Executes.loop_true (b := fun s : Aux × Option Bool => s.2.isSome) rfl hr ih
       have ht : 1 + (2 * bs.length + 1) + 1 = 2 * (bs.length + 1) + 1 := by omega
-      simpa only [List.tail_cons, List.head?_cons, List.length_cons, ht] using hh
+      simpa only [List.tail_cons, List.head?_cons, List.length_cons, ht] using! hh
 
 theorem clear_executes (base : K → List Bool) (src : K) (xs : List Bool)
     (a : Aux) (scratch : Option Bool) :
@@ -46,7 +46,7 @@ theorem clear_executes (base : K → List Bool) (src : K) (xs : List Bool)
   rw [pop_working] at hr
   have hh := Executes.seq hr (clearLoop_executes base src xs a)
   have ht : 1 + (2 * xs.length + 1) = 2 * xs.length + 2 := by omega
-  simpa only [ht] using hh
+  simpa only [ht] using! hh
 
 theorem clear_store (src : K) (s : BitStore K Aux) :
     Executes (clear src) s ⟨(s.state.1, none), Function.update s.stk src []⟩

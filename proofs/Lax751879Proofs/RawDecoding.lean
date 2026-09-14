@@ -1,5 +1,8 @@
 import Lax751879Proofs.DecoderSoundness
 
+-- Preserve Lean 4.30 elaboration of dependent indices during this port.
+set_option backward.isDefEq.respectTransparency false
+
 namespace Lax751879Proofs.RawDecoding
 
 open Lax751879.OrderedStructures Lax751879.StructureEncoding

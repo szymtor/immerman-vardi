@@ -43,7 +43,7 @@ theorem emit_executes (s : EvalStore K Aux) (rev : K) (slots : List (K × K))
     · simp [result, Op.apply, t, hpack, setStack, packTuple_stk_scratch, Function.update_idem]
   have hh := Executes.seq hp (Executes.seq hs hz)
   rw [he] at hh
-  simpa only [Nat.add_assoc] using hh
+  simpa only [Nat.add_assoc] using! hh
 
 def table (n k : Nat) (b : List Nat → Bool) : List Bool := (tuples n k).map b
 

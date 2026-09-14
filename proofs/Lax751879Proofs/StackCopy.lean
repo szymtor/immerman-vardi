@@ -80,7 +80,7 @@ theorem forkLoop_executes (base : K → List Bool) (src left right : K)
       have ht : (1 + (1 + 1)) + (4 * bs.length + 1) + 1 =
           4 * (bs.length + 1) + 1 := by omega
       simpa only [List.tail_cons, List.head?_cons, List.reverse_cons,
-        List.length_cons, List.append_assoc, List.singleton_append, ht] using hh
+        List.length_cons, List.append_assoc, List.singleton_append, ht] using! hh
 
 theorem fork_executes (base : K → List Bool) (src left right : K)
     (hl : src ≠ left) (hr : src ≠ right) (hlr : left ≠ right)
@@ -94,7 +94,7 @@ theorem fork_executes (base : K → List Bool) (src left right : K)
   rw [pop_working3 base src left right hl hr] at hr'
   have h := Executes.seq hr' (forkLoop_executes base src left right hl hr hlr xs ys zs a)
   have ht : 1 + (4 * xs.length + 1) = 4 * xs.length + 2 := by omega
-  simpa only [ht] using h
+  simpa only [ht] using! h
 
 /-- Copy onto a target stack using an initially empty temporary stack.
 The source string is restored in its original order. -/

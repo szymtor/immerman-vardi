@@ -1,6 +1,9 @@
 import Lax751879Proofs.NonemptyPatterns
 import Lax751879Proofs.ClockLast
 
+-- Preserve Lean 4.30 elaboration of dependent indices during this port.
+set_option backward.isDefEq.respectTransparency false
+
 namespace Lax751879Proofs.AcceptRule
 
 open Turing Lax751879.OrderedStructures RuleConstants NonemptyPatterns

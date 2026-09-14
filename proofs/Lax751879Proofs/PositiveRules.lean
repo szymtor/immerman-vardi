@@ -8,6 +8,9 @@ transition table: guards are first-order and every premise refers positively
 to the relation being constructed. No logical expressibility is assumed.
 -/
 
+-- Preserve Lean 4.30 elaboration of dependent indices during this port.
+set_option backward.isDefEq.respectTransparency false
+
 namespace Lax751879Proofs.PositiveRules
 
 open Lax751879.OrderedStructures Lax751879.FixedPointSyntax

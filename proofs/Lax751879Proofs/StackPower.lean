@@ -47,7 +47,7 @@ theorem result_addTokens (base : K → List Bool) (counter out : K) (hne : count
   induction xs generalizing ys scratch with
   | nil =>
       simpa only [result, List.length_nil, Nat.mul_zero, List.replicate_zero,
-        List.nil_append] using pop_working base counter out hne [] ys a scratch
+        List.nil_append] using! pop_working base counter out hne [] ys a scratch
   | cons b bs ih =>
       simp only [List.length_cons, result]
       rw [show readStore counter (working base counter out (b :: bs) ys a scratch) =
@@ -138,7 +138,7 @@ theorem power_executes (domain out tmp : K)
         simp [working, addTokens, pow_succ, ← hcounter]
       rw [hresult] at hexec
       refine ⟨(7 * n + 4) + t, ?_, Executes.seq hcopy hexec⟩
-      simp only [costPolynomial, Polynomial.eval_add,
+      simp only [List.length_cons, costPolynomial, Polynomial.eval_add,
         Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_X]
       rw [Nat.mul_comm n]
       omega

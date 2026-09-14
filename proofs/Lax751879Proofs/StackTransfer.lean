@@ -68,7 +68,7 @@ theorem transferLoop_executes [DecidableEq K] (base : K → List Bool) (src dst 
         (Executes.seq hp hr) (ih (b :: ys))
       have ht : (1 + 1) + (3 * bs.length + 1) + 1 = 3 * (bs.length + 1) + 1 := by omega
       simpa only [List.tail_cons, List.head?_cons, List.reverse_cons,
-        List.length_cons, List.append_assoc, List.singleton_append, ht] using hh
+        List.length_cons, List.append_assoc, List.singleton_append, ht] using! hh
 
 theorem transfer_executes [DecidableEq K] (base : K → List Bool) (src dst : K)
     (hne : src ≠ dst) (xs ys : List Bool) (a : Aux) (scratch : Option Bool) :
@@ -79,14 +79,14 @@ theorem transfer_executes [DecidableEq K] (base : K → List Bool) (src dst : K)
   rw [pop_working base src dst hne] at hr
   have h := Executes.seq hr (transferLoop_executes base src dst hne xs ys a)
   have ht : 1 + (3 * xs.length + 1) = 3 * xs.length + 2 := by omega
-  simpa only [ht] using h
+  simpa only [ht] using! h
 
 theorem transfer_store [DecidableEq K] (src dst : K) (hne : src ≠ dst)
     (s : BitStore K Aux) :
     Executes (transfer src dst) s
       ⟨(s.state.1, none), Function.update (Function.update s.stk src []) dst
         ((s.stk src).reverse ++ s.stk dst)⟩ (3 * (s.stk src).length + 2) := by
-  simpa only [working, Function.update_eq_self, Prod.mk.eta] using
+  simpa only [working, Function.update_eq_self, Prod.mk.eta] using!
     transfer_executes s.stk src dst hne (s.stk src) (s.stk dst) s.state.1 s.state.2
 
 theorem working_input (xs : List Bool) :
@@ -113,7 +113,7 @@ theorem reverse_polytime :
     id id List.reverse (Polynomial.C 3 * Polynomial.X + 2)
   intro xs
   refine ⟨3 * xs.length + 2, by simp, ?_⟩
-  simpa only [List.append_nil, working_input, working_output] using
+  simpa only [List.append_nil, working_input, working_output] using!
     transfer_executes (fun _ : Bool => []) false true (by decide) xs [] () none
 
 end Lax751879Proofs.StackTransfer

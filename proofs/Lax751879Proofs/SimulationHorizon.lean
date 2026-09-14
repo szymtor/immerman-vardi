@@ -46,7 +46,7 @@ theorem accepts_iff (d : Nat) (b : Bool)
       (some (haltList h.tm [h.outputAlphabet.symm (f (encode A))]))
       (h.time.eval (encode A).length) := by
     simpa only [TM2OutputsInTime, id_eq, List.map_cons, List.map_nil, Option.map_some,
-      InitialInput.raw_eq_encode] using h.outputsFun (encode A)
+      InitialInput.raw_eq_encode] using! h.outputsFun (encode A)
   exact (NodeAcceptance.accepts_iff h.tm (InitialInput.raw h.tm h.inputAlphabet A)
     (InitialInput.names h.tm h.inputAlphabet A) (InitialInput.names_injective h.tm h.inputAlphabet A)
     (h.outputAlphabet.symm (f (encode A))) (h.outputAlphabet.symm b) hr hN).trans

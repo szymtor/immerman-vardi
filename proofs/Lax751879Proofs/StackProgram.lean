@@ -10,6 +10,9 @@ The correctness theorem transfers a terminating structured execution to
 actual TM2 steps, with no assumption of a compiler or composition theorem.
 -/
 
+-- Preserve Lean 4.30 elaboration of dependent indices during this port.
+set_option backward.isDefEq.respectTransparency false
+
 namespace Lax751879Proofs.StackProgram
 
 open Turing
@@ -175,7 +178,7 @@ theorem compile_correct [DecidableEq K] {p : Program Γ σ} {s t : Store Γ σ} 
           simp only [compile, Sum.elim_inl, TM2.stepAux, hb, Bool.cond_true]
           rfl)
       have hbody := ih (embed ∘ Sum.inr ∘ Sum.inl) next (fun l => hc (.inr (.inl l)))
-      simpa only [Nat.add_comm 1] using runs_trans hstart hbody
+      simpa only [entry, Nat.add_comm 1] using runs_trans hstart hbody
   | @branch_false p q s t a b hb hq ih =>
       intro embed next hc
       have hstart := runs_one code (embed (.inl ())) s
@@ -184,7 +187,7 @@ theorem compile_correct [DecidableEq K] {p : Program Γ σ} {s t : Store Γ σ} 
           simp only [compile, Sum.elim_inl, TM2.stepAux, hb, Bool.cond_false]
           rfl)
       have hbody := ih (embed ∘ Sum.inr ∘ Sum.inr) next (fun l => hc (.inr (.inr l)))
-      simpa only [Nat.add_comm 1] using runs_trans hstart hbody
+      simpa only [entry, Nat.add_comm 1] using runs_trans hstart hbody
   | loop_false hb =>
       intro embed next hc
       apply runs_one
@@ -200,7 +203,7 @@ theorem compile_correct [DecidableEq K] {p : Program Γ σ} {s t : Store Γ σ} 
           rfl)
       have hbody := ihp (embed ∘ Sum.inr) (some (embed (.inl ()))) (fun l => hc (.inr l))
       have hrest := ihloop embed next hc
-      simpa only [Nat.add_comm 1, Nat.add_assoc] using
+      simpa only [entry, Nat.add_comm 1, Nat.add_assoc] using
         runs_trans hstart (runs_trans hbody hrest)
 
 /-- The actual finite machine obtained by compiling a structured program. -/

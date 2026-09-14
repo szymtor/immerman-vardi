@@ -4,10 +4,19 @@ Original draft: lax-979537. New local draft: lax-751879.
 User authorized a separate draft with a link to the original, without supersedes.
 Sources are copied from the original published commit; namespaces, toolchain,
 mathlib and dependency names have been updated. Dependency commit pins for
-other new drafts are pending their validation and publication. No Lean 4.33
-validation has passed yet. No archive submission or registration performed.
+other new drafts are pending their validation and publication. Full Lean 4.33 validation and independent kernel replay passed (2m39s;
+8 concepts, 9 annotated proofs). CapturesPtime regression passed, including
+concrete node/clock examples and background-only axiom audits.
+No archive submission or registration performed.
 
-Next: build, fix compatibility errors, validate/replay and submit in dependency order.
+Compatibility changes: explicit simpa using!, dependent-index elaboration
+compatibility options in affected proof modules, and explicit simplification
+of set membership, Nat successors and list lengths. Concept code is unchanged
+apart from namespace renaming. Retain inherited helper lemmas intentionally
+for downstream reuse (including Fagin) and provenance; the new linter reports
+184 unused-helper warnings, some on generated declarations.
+
+Next: push lean-4.33 and submit the validated draft, then repin Fagin.
 
 ## Historical record from the original (not validation of this port)
 

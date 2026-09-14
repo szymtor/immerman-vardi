@@ -33,7 +33,7 @@ theorem result_working (base : K â†’ List Bool) (index table : K) (hne : index â
       working base index table [] (ys.drop xs.length) a none := by
   induction xs generalizing ys scratch with
   | nil =>
-      simpa only [result, List.length_nil, List.drop_zero] using
+      simpa only [result, List.length_nil, List.drop_zero] using!
         pop_working base index table hne [] ys a scratch
   | cons b bs ih =>
       simp only [List.length_cons, result]

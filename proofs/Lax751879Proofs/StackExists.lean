@@ -53,7 +53,7 @@ theorem accumulate_returns (s : EvalStore K Aux) (counter coord acc : K)
       · subst key; simp [Op.apply, result, ha, pack, payload, working, Ne.symm hca, Ne.symm hxa]
       · simp [Op.apply, result, Function.update_apply, t, pack, payload, working, hk]
   rw [he] at hh
-  simpa only [Nat.add_assoc] using hh
+  simpa only [Nat.add_assoc] using! hh
 
 theorem fold_or (b : Nat → Bool) (start count : Nat) (a : Bool) :
     foldRange (fun i a => a || b i) start count a =

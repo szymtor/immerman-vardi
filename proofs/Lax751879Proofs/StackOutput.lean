@@ -42,7 +42,7 @@ theorem clearPorts_executes (keys : List K) (s : BitStore K Aux) (M : Nat)
     (hs : ∀ key, (s.stk key).length ≤ M) :
     ∃ c, c ≤ (2 * M + 2) * keys.length + 1 ∧ Executes (clearPorts keys) s (cleared keys s) c := by
   induction keys generalizing s with
-  | nil => exact ⟨1, by simp, by simpa [cleared] using Executes.atom (.load (fun s => (s.1, none))) s⟩
+  | nil => exact ⟨1, by simp, by simpa [cleared] using! Executes.atom (.load (fun s => (s.1, none))) s⟩
   | cons key keys ih =>
       let u : BitStore K Aux := ⟨(s.state.1, none), Function.update s.stk key []⟩
       have hu : ∀ j, (u.stk j).length ≤ M := by

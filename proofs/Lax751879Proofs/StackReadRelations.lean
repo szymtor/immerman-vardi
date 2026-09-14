@@ -49,7 +49,7 @@ theorem oneTable_executes (w : Workspace K) (arity : Nat) (table : K)
     (w.counters.take arity) w.counters_nodup.take hslots n s
     hs.1 hs.2.1 hs.2.2.1 hs.2.2.2.1 ht
     (fun c hm => hs.2.2.2.2 c (List.mem_of_mem_take hm))
-  simpa only [List.length_take, Nat.min_eq_left hbound] using h
+  simpa only [List.length_take, Nat.min_eq_left hbound] using! h
 
 theorem result_ready (w : Workspace K) (table : K) (hf : Fresh w table)
     (n arity : Nat) (s : BitStore K (Aux × Bool)) (hs : Ready w n s) :

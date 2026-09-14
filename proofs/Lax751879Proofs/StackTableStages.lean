@@ -136,7 +136,7 @@ theorem tableStages_executes (s : EvalStore K Aux)
       rw [he] at hp
       refine ⟨c, none, ?_, ?_⟩
       · dsimp only [roundCost]; omega
-      · simpa only [hk] using hp)
+      · simpa only [hk] using! hp)
     a (by
       have hdc : domain ≠ current := by tauto
       simpa [family, setStack, result, hdc] using hdomain)

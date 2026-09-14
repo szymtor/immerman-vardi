@@ -25,7 +25,7 @@ theorem less_returns (left right copyLeft copyRight tmp : K)
   have hx := Executes.seq (answer_returns true s) h
   change c ≤ 12 * ((s.stk left).length + (s.stk right).length) + 18 at hc
   refine ⟨1 + c, by omega, ?_⟩
-  simpa [less, Returns, StackCheckBound.result, result] using hx
+  simpa [less, Returns, StackCheckBound.result, result] using! hx
 
 theorem not_less_both (a b : Nat) : (!(decide (a < b) || decide (b < a))) = decide (a = b) := by
   by_cases h : a = b

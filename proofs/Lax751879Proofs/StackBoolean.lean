@@ -63,6 +63,6 @@ theorem binary_returns (port : K) (op : Bool → Bool → Bool)
   rw [combine_saved] at hc
   have h := Executes.seq hp (Executes.seq hs (Executes.seq hq hc))
   have he : cp + (1 + (cq + 1)) = cp + cq + 2 := by omega
-  simpa only [he] using h
+  simpa only [he] using! h
 
 end Lax751879Proofs.StackBoolean

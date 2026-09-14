@@ -6,6 +6,9 @@ import Lax751879Proofs.StackOutput
 import Lax751879Proofs.DecisionProcedure
 import Lax751879Proofs.InputSize
 
+-- Preserve Lean 4.30 elaboration of dependent indices during this port.
+set_option backward.isDefEq.respectTransparency false
+
 namespace Lax751879Proofs.FormulaDecision
 
 open Lax751879.OrderedStructures Lax751879.FixedPointSyntax
@@ -75,7 +78,7 @@ theorem evaluate_executes (φ : Formula σ m) (xs : List Bool) :
       refine ⟨2, by omega, ?_⟩
       have hp := Executes.branch_false (b := fun s => s.1.2) (q := answer false)
         (p := FormulaProgram.compile φ.val (inputs φ) Sum.inr) hf (answer_returns false (decoded φ xs))
-      simpa [evaluate, DecisionProcedure.decideFormula, DecisionProcedure.checkedDecode, hd] using hp
+      simpa [evaluate, DecisionProcedure.decideFormula, DecisionProcedure.checkedDecode, hd] using! hp
   | some A =>
       have he := DecoderSoundness.decode_sound σ m xs A hd
       have ht : (decoded φ xs).state.1.2 = true := by simpa [decoded, StackRename.sumStore, hd] using hv
@@ -89,7 +92,7 @@ theorem evaluate_executes (φ : Formula σ m) (xs : List Bool) :
       have hb := PolynomialBounds.eval_mono (FormulaProgram.costPolynomial φ.val) hn
       refine ⟨c + 1, by omega, ?_⟩
       simpa [evaluate, DecisionProcedure.decideFormula, DecisionProcedure.checkedDecode, hd, he,
-        DecisionProcedure.evaluatePointed] using Executes.branch_true (q := answer false) ht hp
+        DecisionProcedure.evaluatePointed] using! Executes.branch_true (q := answer false) ht hp
 
 /-- Complete execution on every bit string: decode, evaluate or reject,
 clear all work, return one bit, and reset finite control. -/

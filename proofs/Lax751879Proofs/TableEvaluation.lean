@@ -3,6 +3,9 @@ import Lax751879Proofs.StructureEncoding
 import Mathlib.Data.Fintype.Pi
 import Mathlib.Data.Fintype.BigOperators
 
+-- Preserve Lean 4.30 elaboration of dependent indices during this port.
+set_option backward.isDefEq.respectTransparency false
+
 namespace Lax751879Proofs.TableEvaluation
 
 open Lax751879.OrderedStructures Lax751879.FixedPointSyntax

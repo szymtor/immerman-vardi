@@ -82,7 +82,7 @@ theorem loop_executes (base : α → BitStore K Aux) (counter coord : K) (hne : 
       refine ⟨(c + (1 + 1)) + d + 1, ?_, ?_⟩
       · rw [Nat.mul_succ]; omega
       · simpa only [Nat.add_sub_cancel, Nat.add_eq_zero_iff, Nat.one_ne_zero, and_false,
-          if_false, foldRange, Nat.add_assoc, Nat.add_comm 1 remaining] using he
+          if_false, foldRange, Nat.add_assoc, Nat.add_comm 1 remaining] using! he
 
 theorem forCount_executes (base : α → BitStore K Aux) (counter coord : K) (hne : counter ≠ coord)
     (body : BitProgram K Aux) (f : Nat → α → α) (n B : Nat)

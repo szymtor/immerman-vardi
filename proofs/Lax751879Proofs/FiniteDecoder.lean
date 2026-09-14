@@ -97,7 +97,7 @@ theorem program_executes (σ : Vocabulary) (k : Nat) (xs : List Bool) :
     (fun p hp => by
       change p ≠ (work σ k).input at hp
       simp [inputStore, ioStore, hp])
-  simpa [inputStore, ioStore, layout] using h
+  simpa [inputStore, ioStore, layout] using! h
 
 theorem decoder_runs (σ : Vocabulary) (k : Nat) (xs : List Bool) :
     ∃ t, t ≤ cost σ k xs.length ∧

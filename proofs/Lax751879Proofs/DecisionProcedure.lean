@@ -41,7 +41,7 @@ theorem evaluatePointed_correct {σ : Vocabulary} {k : Nat} (φ : Formula σ k)
       (fun r => Fin.elim0 r) := by
     funext r
     exact Fin.elim0 r
-  simpa only [evaluatePointed, Satisfies, he] using
+  simpa only [evaluatePointed, Satisfies, he] using!
     evaluate_correct φ.val φ.property A.structureValue A.tuple (fun r => Fin.elim0 r)
 
 /-- Total executable decision function on bit strings. The separate machine

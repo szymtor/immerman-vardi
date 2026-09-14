@@ -61,7 +61,7 @@ theorem address_lt_iff (n k : Nat) (a b : Fin k → Fin n) :
       rw [address_succ, address_succ]
       rcases lt_trichotomy (a 0) (b 0) with h | h | h
       · have hmul : n ^ k * (a 0).val + n ^ k ≤ n ^ k * (b 0).val := by
-          simpa only [Nat.mul_add, Nat.mul_one] using
+          simpa only [Nat.succ_eq_add_one, Nat.mul_add, Nat.mul_one] using
             Nat.mul_le_mul_left (n ^ k) (Nat.succ_le_of_lt h)
         constructor
         · exact fun _ => Or.inl h
@@ -71,7 +71,7 @@ theorem address_lt_iff (n k : Nat) (a b : Fin k → Fin n) :
           Nat.add_lt_add_iff_right]
         exact ih (Fin.tail a) (Fin.tail b)
       · have hmul : n ^ k * (b 0).val + n ^ k ≤ n ^ k * (a 0).val := by
-          simpa only [Nat.mul_add, Nat.mul_one] using
+          simpa only [Nat.succ_eq_add_one, Nat.mul_add, Nat.mul_one] using
             Nat.mul_le_mul_left (n ^ k) (Nat.succ_le_of_lt h)
         constructor
         · intro hh

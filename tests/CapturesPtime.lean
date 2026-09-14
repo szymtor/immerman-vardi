@@ -3,6 +3,9 @@ import Mathlib.Data.Fin.VecNotation
 
 open Turing Lax751879Proofs Lax751879.OrderedStructures Lax751879.FixedPointSemantics
 
+-- Preserve Lean 4.30 elaboration of dependent indices during this port.
+set_option backward.isDefEq.respectTransparency false
+
 namespace CapturesPtimeTest
 
 @[reducible] def tm : FinTM2 where
