@@ -39,3 +39,6 @@ bibEntries:
       doi = {10.1145/800070.802186},
       url = {https://www.cs.rice.edu/~vardi/papers/stoc82.pdf}
     }
+issue:
+  repositoryId: 1320232165
+  number: 110
