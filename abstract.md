@@ -21,3 +21,5 @@ The proofs include the fixed-point laws, positivity and monotonicity,
 encoding injectivity, and the simulation and runtime arguments. The main
 theorems use only Lean's standard background axioms, with no unproved
 simulation assumptions.
+
+This is a Lean 4.33 port of [the original Lean 4.30 draft](https://laxarchive.org/lax-979537/).

@@ -1,3 +1,16 @@
+# Lean 4.33 draft migration
+
+Original draft: lax-979537. New local draft: lax-751879.
+User authorized a separate draft with a link to the original, without supersedes.
+Sources are copied from the original published commit; namespaces, toolchain,
+mathlib and dependency names have been updated. Dependency commit pins for
+other new drafts are pending their validation and publication. No Lean 4.33
+validation has passed yet. No archive submission or registration performed.
+
+Next: build, fix compatibility errors, validate/replay and submit in dependency order.
+
+## Historical record from the original (not validation of this port)
+
 # Immerman–Vardi proof implementation
 
 Updated: 2026-09-08.
@@ -40,7 +53,7 @@ spend effort optimizing constants or exponents. No token budget was requested.
 Read `PROPOSED_CONCEPTS.md`. The theorem is `Definable Q ↔ InP Q` for every
 fixed finite relational vocabulary and query arity on finite ordered
 structures. Inputs use a unary domain-size header and dense relation tables.
-Lax58 was considered but is not a concept or proof dependency. The user's
+Lax560851 was considered but is not a concept or proof dependency. The user's
 criteria are fidelity to the original formulation and clarity of concepts.
 
 ## Proved
@@ -122,8 +135,8 @@ or by generalizing this proof-only compiler. Approved syntax already supports
 them. The finite-exception construction does support arbitrary query arity.
 
 The inspected mathlib `TM2ComputableInPolyTime` module does not provide a
-ready-made compiler for the relation-table evaluator. Lax51 has substantial
-RAM/TM simulation proofs, and Lax13Proofs has an IMP compiler, which may help
+ready-made compiler for the relation-table evaluator. Lax759944 has substantial
+RAM/TM simulation proofs, and Lax865980Proofs has an IMP compiler, which may help
 as explicitly pinned proof dependencies; neither currently supplies this
 formula evaluator or the descriptive-complexity direction. No dependency
 was added speculatively, and no imported `proof_wanted` assertion was used.

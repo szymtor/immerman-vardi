@@ -14,7 +14,7 @@ are rejected. The machine and polynomial are fixed for the query.
 The machine model and step count are mathlib's bundled finite multi-stack
 Turing machines (`TM2ComputableInPolyTime`), with identity encoding on input
 bit strings and a single output bit. This is the same underlying complexity
-notion used in Lax51, specialized directly to bit-string decision problems.
+notion used in Lax759944, specialized directly to bit-string decision problems.
 There is no abstract computation oracle or machine-simulation hypothesis.
 -/
 

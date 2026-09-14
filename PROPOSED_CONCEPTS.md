@@ -43,7 +43,7 @@ Current proof status is recorded in `CURRENT_STATE.md`.
   convention. A unary domain header also handles empty vocabularies without
   compressing an n-element domain into only log n bits. This choice is simpler
   to inspect than introducing a structural arena and conversion theorems.
-- **Lax58:** useful infrastructure for a possible RAM implementation in the
+- **Lax560851:** useful infrastructure for a possible RAM implementation in the
   proof package, but not a concept dependency. The main criterion here is
   fidelity to the classical statement and a short, transparent interface.
 
