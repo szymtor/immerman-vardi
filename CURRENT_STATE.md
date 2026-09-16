@@ -1,3 +1,26 @@
+# Registered final submission — lax-751879
+
+Updated 2026-09-16. The user authorized final publication of the six current
+Lean 4.33 submissions and normalization of AI author credits to GPT, retaining
+version numbers. This supersedes earlier keep-draft restrictions for this release.
+
+- Registered and citable: https://laxarchive.org/lax-751879/
+- Frozen source: `9fa09900c827396420a8bcfd22bc624e5c980a53` on `lean-4.33`.
+- The release changes only `manifest.yaml` relative to the previous accepted
+  Archive source; Lean sources and the previously replayed proofs are unchanged.
+- Fresh full local Lax compilation and statement inspection passed. The Archive
+  independently verified the author-only diff and reused its validated capture.
+- After registration, the refreshed Archive record was verified against the
+  exact source and capture provenance, GPT author credits, all concept source
+  text, proof counts and complete proof closure, and registered dependency pins.
+- Evidence: `../migration-tools/finalize-foundations-verification.log` and
+  the corresponding `finalize-*-build.log`, `-submit.log`, and `-register.log`.
+
+No further publication is needed. Downstream submissions must pin the frozen
+source above. Local status documentation may advance after that immutable commit.
+
+## Earlier history
+
 # Lean 4.33 draft migration
 
 Original draft: lax-979537. New local draft: lax-751879.
@@ -7,7 +30,9 @@ mathlib and dependency names have been updated. Dependency commit pins for
 other new drafts are pending their validation and publication. Full Lean 4.33 validation and independent kernel replay passed (2m39s;
 8 concepts, 9 annotated proofs). CapturesPtime regression passed, including
 concrete node/clock examples and background-only axiom audits.
-No archive submission or registration performed.
+Published at https://laxarchive.org/lax-751879/ from
+22b06ecb75e26570ccfb67582c9e3d12e88fdf65 (issue 110). Archive rebuild
+passed in 6m26s and publication succeeded. No registration performed.
 
 Compatibility changes: explicit simpa using!, dependent-index elaboration
 compatibility options in affected proof modules, and explicit simplification
@@ -16,7 +41,7 @@ apart from namespace renaming. Retain inherited helper lemmas intentionally
 for downstream reuse (including Fagin) and provenance; the new linter reports
 184 unused-helper warnings, some on generated declarations.
 
-Next: push lean-4.33 and submit the validated draft, then repin Fagin.
+Next: Fagin port pins this published commit.
 
 ## Historical record from the original (not validation of this port)
 
